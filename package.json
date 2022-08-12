@@ -1,0 +1,35 @@
+{
+  "name": "@oak-digital/types-4-strapi-2",
+  "version": "0.1.0",
+  "description": "Typescript interface generator for Strapi 4 models",
+  "bin": {
+    "t4s": "./bin/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "t4s": "node ./bin/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oak-Digital/types-4-strapi-2.git"
+  },
+  "keywords": [
+    "strapi",
+    "typescript",
+    "types",
+    "generator"
+  ],
+  "author": "Oak digital",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Oak-Digital/types-4-strapi-2/issues"
+  },
+  "homepage": "https://github.com/Oak-Digital/types-4-strapi-2",
+  "devDependencies": {
+    "@types/node": "^18.7.2",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "commander": "^9.4.0"
+  }
+}
