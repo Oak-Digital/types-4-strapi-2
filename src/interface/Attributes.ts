@@ -15,15 +15,15 @@ export default class Attributes {
             case "component":
             case "dynamiczone":
             case "relation":
-                return false;
+                return true;
             default:
                 break;
         }
 
-        return attr.required !== true;
+        return !attr.required;
     }
 
-    getDependencies() {
+    getDependencies(strapiName: string) {
         const dependencies = [];
         for (const attrName in this.Attrs) {
             const attr = this.Attrs[attrName];
@@ -38,6 +38,10 @@ export default class Attributes {
                 default:
                     continue;
             }
+            // // If the current dependency is the interface itself, do not report it as a dependency
+            // if (dependencyName === strapiName) {
+            //     continue;
+            // }
             dependencies.push(dependencyName);
         }
         return dependencies;
@@ -45,11 +49,13 @@ export default class Attributes {
 
     attributeToString(attrName: string, attr: any) {
         let optionalString = this.isAttributeOptional(attr) ? '?' : '';
-        let str = `${attrName}${optionalString}: `
+        let str = `    ${attrName}${optionalString}: `
         let isArray : boolean = false;
         switch (attr.type) {
             case "relation":
                 const apiName = attr.target;
+                // console.log(attrName)
+                // console.log(this.RelationNames, apiName)
                 const dependencyName = this.RelationNames[apiName][0];
                 isArray = attr.relation.endsWith("ToMany");
                 str += dependencyName;
@@ -82,6 +88,7 @@ export default class Attributes {
                 break;
             case "boolean":
                 str += attr.type;
+                break;
             case "json":
             default:
                 str += "any";
@@ -102,7 +109,7 @@ export default class Attributes {
             }
             strings.push(attrString)
         }
-        strings.push("}")
+        strings.push("  }")
         return strings.join("\n");
     }
 }

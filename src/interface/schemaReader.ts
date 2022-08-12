@@ -27,7 +27,8 @@ export async function getComponentSchemas(strapiSrcRoot: string) {
         const schemaFilesPath = join(strapiSrcRoot, "components", category);
         const schemaFiles = await readDirFiltered(schemaFilesPath);
         const schemaNamesWithAttributesPromises = schemaFiles.map(async (file: string) => {
-            const attributes = await readSchema(file);
+            const schemaPath = join(schemaFilesPath, file);
+            const attributes = await readSchema(schemaPath);
             const name = file.split(".")[0];
             return { name, attributes }
         })

@@ -5,10 +5,11 @@
     "module": "commonjs",           /* 'none', 'commonjs', 'amd', 'system', etc */
     "declaration": true,            /* Concatenate & emit output to single file.*/
     "outDir": "lib",                /* Redirect output to the directory. */
-    "rootDir": "src",
     "types": [ "node" ],
     "resolveJsonModule": true,
     "esModuleInterop": true,        /* Enables intero between CommonJS and ES */
     "skipLibCheck": true            /* Skip type checking of declaration files. */
-  }
+  },
+  "include": [ "src/**/*" ],
+  "exclude": [ "types/**/*", "src/testtypes/**/*" ]
 }

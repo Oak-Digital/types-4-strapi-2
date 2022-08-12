@@ -1,14 +1,1 @@
-{
-  "compilerOptions": {
-    "incremental": true,            /* Enable incremental compilation */
-    "target": "es5",                /* Specify ECMAScript target version: */
-    "module": "commonjs",           /* 'none', 'commonjs', 'amd', 'system', etc */
-    "declaration": true,            /* Concatenate & emit output to single file.*/
-    "outDir": "lib",                /* Redirect output to the directory. */
-    "rootDir": "src",
-    "types": [ "node" ],
-    "resolveJsonModule": true,
-    "esModuleInterop": true,        /* Enables intero between CommonJS and ES */
-    "skipLibCheck": true            /* Skip type checking of declaration files. */
-  }
-}
+tsconfig.jsonc

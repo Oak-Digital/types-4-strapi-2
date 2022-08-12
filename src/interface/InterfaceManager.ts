@@ -1,5 +1,8 @@
+import { existsSync } from "fs";
 import { mkdir, rm, writeFile } from "fs/promises";
 import { join } from "path";
+import { pascalCase } from "../utils";
+import ComponentInterface from "./ComponentInterface";
 import Interface from "./Interface";
 import { getApiSchemas, getComponentCategoryFolders, getComponentSchemas } from "./schemaReader";
 
@@ -39,20 +42,22 @@ export default class InterfaceManager {
             category.schemas.forEach((schema) => {
                 const componentName = schema.name;
                 const strapiName = `${categoryName}.${schema.name}`
-                const componentPrefix = `${this.Options.componentPrefix}${this.Options.useCategoryPrefix ? categoryName : ""}`;
+                const componentPrefix = `${this.Options.componentPrefix}${this.Options.useCategoryPrefix ? pascalCase(categoryName) : ""}`;
                 const prefix = this.Options.componentPrefixOverridesPrefix ? componentPrefix : this.Options.prefix + componentPrefix;
                 // TODO: make component interface
-                // const inter = new Interface(componentName, schema.attributes, `./${categoryName}`, prefix);
-                // this.Interfaces[strapiName] = inter;
+                const inter = new ComponentInterface(componentName, schema.attributes, `./${categoryName}`, categoryName, prefix);
+                this.Interfaces[strapiName] = inter;
             })
         })
     }
 
     // Inject dependencies into all interfaces
     injectDependencies() {
+        // console.log("Injecting dependencies")
         Object.keys(this.Interfaces).forEach((strapiName: string) => {
             const inter = this.Interfaces[strapiName];
             const dependencies = inter.getDependencies();
+            // console.log(`Interfaces for ${inter.getStrapiName()} are`)
             const interfacesToInject = dependencies.map((dependencyStrapiName: string) => {
                 return this.Interfaces[dependencyStrapiName];
             }).filter((inter) => inter);
@@ -62,14 +67,17 @@ export default class InterfaceManager {
 
     async makeFolders() {
         const componentCategories = await getComponentCategoryFolders(this.StrapiSrcRoot);
-        await rm(this.OutRoot, {
-            recursive: true,
-        });
-        await mkdir(this.OutRoot, {
-            recursive: true,
-        });
+        if (!existsSync(this.OutRoot)) {
+            await mkdir(this.OutRoot, {
+                recursive: true,
+            });
+        }
         await Promise.all(componentCategories.map(async (category) => {
-            await mkdir(join(this.OutRoot, category));
+            const path = join(this.OutRoot, category);
+            if (existsSync(path)) {
+                return;
+            }
+            await mkdir(path);
         }));
     }
 
@@ -77,7 +85,7 @@ export default class InterfaceManager {
         const writePromises = Object.keys(this.Interfaces).map(async (strapiName) => {
             const inter = this.Interfaces[strapiName];
             const fileData = inter.toString();
-            const filePath = join(this.OutRoot, inter.getRelativeRootPath());
+            const filePath = join(this.OutRoot, inter.getRelativeRootPathFile());
             await writeFile(filePath, fileData)
         });
         await Promise.all(writePromises);
