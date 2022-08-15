@@ -19,7 +19,9 @@ export default class ComponentInterface extends Interface {
 
     getInterfaceFieldsString() {
         const attrs = this.getAttributes();
-        let str = "    id: number;\n";
+        let str = '';
+        str += `  id: number;\n`;
+        str += `  __component: "${this.getStrapiName()}";\n`
         return str + attrs.toFieldsString();
     }
 }
