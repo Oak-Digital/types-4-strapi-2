@@ -20,7 +20,7 @@ export default class Attributes {
                 break;
         }
 
-        return !attr.required;
+        return false;
     }
 
     getDependencies(strapiName: string) {
@@ -68,6 +68,13 @@ export default class Attributes {
                 break;
             case "password":
                 return null;
+            case "enumeration":
+                const hasDefault = "default" in attr;
+                const enums = attr.enum.map((en: string) => `"${en}"`)
+                enums.push("null")
+                const typeString = enums.join(" | ");
+                str += typeString;
+                break;
             case "string":
             case "text":
             case "richtext":
