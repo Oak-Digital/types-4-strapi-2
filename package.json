@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "tsc -p .",
-    "testtypes": "node ./bin/index.js --out src/testtypes",
+    "testtypes": "node ./bin/index.js",
     "t4s": "node ./bin/index.js"
   },
   "repository": {

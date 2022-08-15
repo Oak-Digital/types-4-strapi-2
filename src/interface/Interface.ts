@@ -8,7 +8,7 @@ export default class Interface {
     private RelationNames: Record<string, [string, Interface]> = {};
     private RelationNamesCounter: Record<string, number> = {};
     private NamePrefix: string = "";
-    private Attributes: any;
+    protected Attributes: any;
     private RelativeDirectoryPath: string;
     protected StrapiName: string;
 
@@ -90,8 +90,12 @@ export default class Interface {
         }).filter(s => s).join("\n");
     }
 
+    getAttributes() : Attributes {
+        return new Attributes(this.Attributes, this.RelationNames);
+    }
+
     attributesToString() {
-        const attrs = new Attributes(this.Attributes, this.RelationNames);
+        const attrs = this.getAttributes();
         return attrs.toString();
     }
 

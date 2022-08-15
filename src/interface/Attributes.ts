@@ -99,8 +99,8 @@ export default class Attributes {
         return str;
     }
 
-    toString() : string {
-        const strings = [ "{" ];
+    toFieldsString() : string {
+        const strings = [];
         for (const attrName in this.Attrs) {
             const attr = this.Attrs[attrName];
             const attrString = this.attributeToString(attrName, attr);
@@ -109,7 +109,13 @@ export default class Attributes {
             }
             strings.push(attrString)
         }
-        strings.push("  }")
+        return strings.map(s => `${s}\n`).join("");
+    }
+
+    toString() : string {
+        const strings = [ "{" ];
+        strings.push(this.toFieldsString());
+        strings.push("}")
         return strings.join("\n");
     }
 }
