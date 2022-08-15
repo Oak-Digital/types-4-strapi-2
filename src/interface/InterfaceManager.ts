@@ -2,6 +2,7 @@ import { existsSync } from "fs";
 import { mkdir, rm, writeFile } from "fs/promises";
 import { join } from "path";
 import { pascalCase } from "../utils";
+import { createMediaFormatInterface, createMediaInterface } from "./builtinInterfaces";
 import ComponentInterface from "./ComponentInterface";
 import Interface from "./Interface";
 import { getApiSchemas, getComponentCategoryFolders, getComponentSchemas } from "./schemaReader";
@@ -17,6 +18,8 @@ export default class InterfaceManager {
         useCategoryPrefix: true,
         componentPrefix: "",
         componentPrefixOverridesPrefix: false,
+        builtinsPrefix: "", // TODO: make this work
+        builtinsPrefixOverridesPrefix: false // TODO: make this work
     };
 
     constructor(outRoot: string, strapiSrcRoot: string, options: any = {}) {
@@ -51,6 +54,16 @@ export default class InterfaceManager {
         })
     }
 
+    createBuiltinInterfaces() {
+        const outDir = "./builtins"
+        const builtinInterfaces = [];
+        builtinInterfaces.push(createMediaInterface(outDir, this.Options.prefix));
+        builtinInterfaces.push(createMediaFormatInterface(outDir, this.Options.prefix));
+        builtinInterfaces.forEach(inter => {
+            this.Interfaces[inter.getStrapiName()] = inter;
+        })
+    }
+
     // Inject dependencies into all interfaces
     injectDependencies() {
         // console.log("Injecting dependencies")
@@ -72,13 +85,21 @@ export default class InterfaceManager {
                 recursive: true,
             });
         }
-        await Promise.all(componentCategories.map(async (category) => {
+        const promises = []
+        const componentCategoriesPromises = componentCategories.map(async (category) => {
             const path = join(this.OutRoot, category);
             if (existsSync(path)) {
                 return;
             }
             await mkdir(path);
-        }));
+        });
+        promises.push(...componentCategoriesPromises);
+        const builtinsPath = join(this.OutRoot, "builtins");
+        if (!existsSync(builtinsPath)) {
+            promises.push(mkdir(join(this.OutRoot, "builtins")));
+        }
+
+        await Promise.all(promises);
     }
 
     async writeInterfaces() {
@@ -105,7 +126,9 @@ export default class InterfaceManager {
         try {
             const createInterfacesPromise = this.createInterfaces();
             const makeFoldersPromise = this.makeFolders();
+            this.createBuiltinInterfaces()
             await createInterfacesPromise;
+            // Create all interfaces before injecting
             this.injectDependencies();
             await makeFoldersPromise;
             await Promise.all([this.writeInterfaces(), this.writeIndexFile()])

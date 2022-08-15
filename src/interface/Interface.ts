@@ -2,10 +2,12 @@ import { dirname, join, parse, relative } from "path";
 import { pascalCase, prefixDotSlash } from "../utils";
 import Attributes from "./Attributes";
 
+export type RelationNames = Record<string, { name: string, inter: Interface }>;
+
 export default class Interface {
     protected BaseName: string;
     private Relations: Interface[] = []; // Components and relations
-    private RelationNames: Record<string, [string, Interface]> = {};
+    private RelationNames: RelationNames = {};
     private RelationNamesCounter: Record<string, number> = {};
     private NamePrefix: string = "";
     protected Attributes: any;
@@ -34,7 +36,7 @@ export default class Interface {
 
     getDependencies() {
         const attrs = new Attributes(this.Attributes, this.RelationNames);
-        return attrs.getDependencies(this.getStrapiName());
+        return attrs.getDependencies();
     }
 
     getFullInterfaceName() {
@@ -72,7 +74,7 @@ export default class Interface {
                     this.RelationNamesCounter[name] = 0;
                 }
             }
-            this.RelationNames[inter.getStrapiName()] = [name, inter];
+            this.RelationNames[inter.getStrapiName()] = { name, inter };
         })
     }
 
@@ -81,8 +83,8 @@ export default class Interface {
             if (strapiName === this.getStrapiName()) {
                 return "";
             }
-            const relationName = this.RelationNames[strapiName][0];
-            const inter = this.RelationNames[strapiName][1];
+            const relationName = this.RelationNames[strapiName].name;
+            const inter = this.RelationNames[strapiName].inter;
             const importPath = prefixDotSlash(relative(this.getRelativeRootDir(), inter.getRelativeRootPath()));
             const fullName = inter.getFullInterfaceName();
             const importNameString = fullName === relationName ? fullName : `${fullName} as ${relationName}`;

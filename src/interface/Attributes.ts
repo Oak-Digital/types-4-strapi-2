@@ -1,10 +1,10 @@
-import Interface from "./Interface";
+import { RelationNames } from "./Interface";
 
 export default class Attributes {
     Attrs: Record<string, Record<string, any>>;
-    private RelationNames: Record<string, [string, Interface]> = {};
+    private RelationNames: RelationNames = {};
 
-    constructor(attr: Record<string, Record<string, any>>, relationNames: Record<string, [string, Interface]>) {
+    constructor(attr: Record<string, Record<string, any>>, relationNames: RelationNames) {
         this.Attrs = attr;
         this.RelationNames = relationNames;
     }
@@ -23,17 +23,24 @@ export default class Attributes {
         return false;
     }
 
-    getDependencies(strapiName: string) {
+    getDependencies() {
         const dependencies = [];
         for (const attrName in this.Attrs) {
             const attr = this.Attrs[attrName];
-            let dependencyName : string;
+            const dependencyNames : string[] = [];
             switch (attr.type) {
+                case "nested":
+                    const attrs = new Attributes(attr.fields, this.RelationNames);
+                    dependencyNames.push(...attrs.getDependencies());
+                    break;
                 case "relation":
-                    dependencyName = attr.target;
+                    dependencyNames.push(attr.target);
                     break;
                 case "component":
-                    dependencyName = attr.component;
+                    dependencyNames.push(attr.component);
+                    break;
+                case "media":
+                    dependencyNames.push("builtins::Media");
                     break;
                 default:
                     continue;
@@ -42,7 +49,11 @@ export default class Attributes {
             // if (dependencyName === strapiName) {
             //     continue;
             // }
-            dependencies.push(dependencyName);
+            dependencyNames.forEach((dependencyName: string) => {
+                if (!dependencies.includes(dependencyName)) {
+                    dependencies.push(dependencyName);
+                }
+            })
         }
         return dependencies;
     }
@@ -52,19 +63,30 @@ export default class Attributes {
         let str = `    ${attrName}${optionalString}: `
         let isArray : boolean = false;
         switch (attr.type) {
+            // types-4-strapi-2 specific, used for builtin types
+            case "nested":
+                // Be careful with recursion
+                // console.log(attr);
+                const newAttrs = new Attributes(attr.fields, this.RelationNames);
+                str += newAttrs.toString();
+                break;
             case "relation":
                 const apiName = attr.target;
-                // console.log(attrName)
                 // console.log(this.RelationNames, apiName)
-                const dependencyName = this.RelationNames[apiName][0];
+                const dependencyName = this.RelationNames[apiName].name;
                 isArray = attr.relation.endsWith("ToMany");
                 str += dependencyName;
                 break;
             case "component":
                 const componentName = attr.component;
-                const dependencyComponentName = this.RelationNames[componentName][0];
+                const relationNameObj = this.RelationNames[componentName];
+                const dependencyComponentName: string = relationNameObj.name;
                 isArray = attr.repeatable ?? false;
                 str += dependencyComponentName;
+                break;
+            case "media":
+                str += this.RelationNames["builtins::Media"].name;
+                isArray = attr.multiple ?? false;
                 break;
             case "password":
                 return null;
