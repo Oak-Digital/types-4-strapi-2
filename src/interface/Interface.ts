@@ -109,8 +109,8 @@ export default class Interface {
 
     getInterfaceFieldsString() {
         let str = '';
-        str += '  id: number;\n';
-        str += `  attributes: ${this.attributesToString()}\n`;
+        str += 'id: number;\n';
+        str += `attributes: ${this.attributesToString()}\n`;
         return str;
     }
 

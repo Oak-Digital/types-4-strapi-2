@@ -6,12 +6,14 @@ import { createMediaFormatInterface, createMediaInterface } from './builtinInter
 import ComponentInterface from './ComponentInterface';
 import Interface from './Interface';
 import { getApiSchemas, getComponentCategoryFolders, getComponentSchemas } from './schemaReader';
+import prettier from 'prettier';
 
 export default class InterfaceManager {
     private Interfaces: Record<string, Interface> = {}; // string = strapi name
     private OutRoot: string;
     private StrapiSrcRoot: string;
     private Options: any;
+    private PrettierOptions: any;
 
     static BaseOptions = {
         prefix: 'I',
@@ -19,13 +21,26 @@ export default class InterfaceManager {
         componentPrefix: '',
         componentPrefixOverridesPrefix: false,
         builtinsPrefix: '', // TODO: make this work
-        builtinsPrefixOverridesPrefix: false // TODO: make this work
+        builtinsPrefixOverridesPrefix: false, // TODO: make this work
+        prettierFile: null,
     };
 
     constructor(outRoot: string, strapiSrcRoot: string, options: any = {}) {
         this.OutRoot = outRoot;
         this.StrapiSrcRoot = strapiSrcRoot;
         this.Options = Object.assign({}, InterfaceManager.BaseOptions, options);
+    }
+
+    async loadPrettierConfig() {
+        const defaultOptions = {
+            parser: 'typescript',
+        };
+        if (!this.Options.prettierFile) {
+            this.PrettierOptions = defaultOptions;
+            return;
+        }
+        const resolved = await prettier.resolveConfig(this.Options.prettierFile);
+        this.PrettierOptions = Object.assign({}, defaultOptions, resolved);
     }
 
     async createInterfaces() {
@@ -106,8 +121,9 @@ export default class InterfaceManager {
         const writePromises = Object.keys(this.Interfaces).map(async (strapiName) => {
             const inter = this.Interfaces[strapiName];
             const fileData = inter.toString();
+            const formattedFileData = prettier.format(fileData, this.PrettierOptions);
             const filePath = join(this.OutRoot, inter.getRelativeRootPathFile());
-            await writeFile(filePath, fileData);
+            await writeFile(filePath, formattedFileData);
         });
         await Promise.all(writePromises);
     }
@@ -118,19 +134,21 @@ export default class InterfaceManager {
             return `export * from '${inter.getRelativeRootPath()}'`;
         });
         const fileData = strings.join('\n');
+        const formattedFileData = prettier.format(fileData, this.PrettierOptions);
         const filePath = join(this.OutRoot, 'index.ts');
-        await writeFile(filePath, fileData);
+        await writeFile(filePath, formattedFileData);
     }
 
     async run() {
         try {
             const createInterfacesPromise = this.createInterfaces();
             const makeFoldersPromise = this.makeFolders();
+            const loadPrettierPromise = this.loadPrettierConfig();
             this.createBuiltinInterfaces();
             await createInterfacesPromise;
             // Create all interfaces before injecting
             this.injectDependencies();
-            await makeFoldersPromise;
+            await Promise.all([makeFoldersPromise, loadPrettierPromise]);
             await Promise.all([this.writeInterfaces(), this.writeIndexFile()]);
         } catch (err) {
             console.error(err);

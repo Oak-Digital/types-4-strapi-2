@@ -41,12 +41,11 @@ This can be done with the `--out` flag like in the following example.
 * Generate typescript interfaces for all your api content-types and components
 * Generate typescript interfaces for builtin types such as `Media` and `MediaFormat`
 * Select input and output directory
+* Prettier formatting and ability to use your own `.prettierrc`.
 
 ### Planned features
 
 * Support if you are using other plugins, such as `url-alias`, which should add extra fields for some interfaces.
-* Nicer formatted interfaces
-* Choose quotestyle in interfaces
 
 ## Help
 

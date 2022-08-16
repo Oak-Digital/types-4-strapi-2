@@ -29,6 +29,7 @@
   "homepage": "https://github.com/Oak-Digital/types-4-strapi-2",
   "devDependencies": {
     "@types/node": "^18.7.2",
+    "@types/prettier": "^2.7.0",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
     "@typescript-eslint/parser": "^5.33.1",
     "eslint": "^8.22.0",
