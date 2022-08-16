@@ -50,3 +50,18 @@ This can be done with the `--out` flag like in the following example.
 ## Help
 
 use `t4s --help` to display which options are available for you
+
+## Building
+
+To build this project, use the following command
+
+```bash
+npm run build
+```
+
+## Publihsing
+
+```bash
+npm run build
+npm publish
+```
