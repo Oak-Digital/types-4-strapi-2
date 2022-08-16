@@ -1,6 +1,6 @@
 import { existsSync } from 'fs';
 import { mkdir, rm, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { join } from 'path/posix';
 import { pascalCase } from '../utils';
 import { createMediaFormatInterface, createMediaInterface } from './builtinInterfaces';
 import ComponentInterface from './ComponentInterface';

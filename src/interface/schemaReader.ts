@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join } from 'node:path/posix';
 import { readDirFiltered } from '../utils';
 
 export async function readSchema(schemaPath: string) {

@@ -1,4 +1,4 @@
-import { dirname, join, relative } from 'path';
+import { dirname, join, relative } from 'path/posix';
 import { pascalCase, prefixDotSlash } from '../utils';
 import Attributes from './Attributes';
 
