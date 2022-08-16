@@ -46,6 +46,7 @@ This can be done with the `--out` flag like in the following example.
 
 * Support if you are using other plugins, such as `url-alias`, which should add extra fields for some interfaces.
 * Nicer formatted interfaces
+* Choose quotestyle in interfaces
 
 ## Help
 
