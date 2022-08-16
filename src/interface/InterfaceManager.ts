@@ -22,6 +22,7 @@ export default class InterfaceManager {
         componentPrefixOverridesPrefix: false,
         builtinsPrefix: '', // TODO: make this work
         builtinsPrefixOverridesPrefix: false, // TODO: make this work
+        deleteOld: false,
         prettierFile: null,
     };
 
@@ -93,7 +94,17 @@ export default class InterfaceManager {
         });
     }
 
+    async deleteOldFolders() {
+        await rm(this.OutRoot, {
+            force: true,
+            recursive: true,
+        });
+    }
+
     async makeFolders() {
+        if (this.Options.deleteOld) {
+            await this.deleteOldFolders();
+        }
         const componentCategories = await getComponentCategoryFolders(this.StrapiSrcRoot);
         if (!existsSync(this.OutRoot)) {
             await mkdir(this.OutRoot, {
