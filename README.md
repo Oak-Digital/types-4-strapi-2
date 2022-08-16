@@ -48,9 +48,15 @@ This can be done with the `--out` flag like in the following example.
 * Support for localization
 * Support if you are using other plugins, such as `url-alias`, which should add extra fields for some interfaces.
 
-## Help
+## Flags
 
-use `t4s --help` to display which options are available for you
+| **flag**                    | **Description**                                                                    |
+|-----------------------------|------------------------------------------------------------------------------------|
+| -i, --in <dir>              | The src directory for strapi                                                       |
+| -o, --out <dir>             | The output directory to output the types to                                        |
+| --component-prefix <prefix> | A prefix for components                                                            |
+| -D, --delete-old            | CAUTION: This option is equivalent to running rm -rf on the output directory first |
+| --prettier <file>           | The prettier config file to use for formatting typescript interfaces               |
 
 ## Building
 
