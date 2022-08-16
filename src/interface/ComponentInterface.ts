@@ -1,4 +1,4 @@
-import Interface from "./Interface";
+import Interface from './Interface';
 
 export default class ComponentInterface extends Interface {
     protected Category: string;
@@ -7,7 +7,7 @@ export default class ComponentInterface extends Interface {
         hasComponent: true,
     };
 
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, category: string, prefix: string = "", options: Record<string, any> = {}) {
+    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, category: string, prefix = '', options: Record<string, any> = {}) {
         super(baseName, attributes, relativeDirectoryPath, prefix);
         this.Category = category;
         // this.Attributes.id = {
@@ -15,11 +15,11 @@ export default class ComponentInterface extends Interface {
         //     required: true,
         // };
         this.updateStrapiName();
-        Object.assign(this.Options, options)
+        Object.assign(this.Options, options);
     }
 
     updateStrapiName() {
-        this.StrapiName = `${this.Category}.${this.getBaseName()}`
+        this.StrapiName = `${this.Category}.${this.getBaseName()}`;
     }
 
     getInterfaceFieldsString() {
@@ -27,10 +27,10 @@ export default class ComponentInterface extends Interface {
         let str = '';
         const { hasId, hasComponent } = this.Options;
         if (hasId) {
-            str += `  id: number;\n`;
+            str += '  id: number;\n';
         }
         if (hasComponent) {
-            str += `  __component: "${this.getStrapiName()}";\n`
+            str += `  __component: "${this.getStrapiName()}";\n`;
         }
         return str + attrs.toFieldsString();
     }

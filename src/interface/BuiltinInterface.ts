@@ -1,7 +1,7 @@
-import Interface from "./Interface";
+import Interface from './Interface';
 
 export default class BuiltinInterface extends Interface {
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix: string = "") {
+    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix = '') {
         super(baseName, attributes, relativeDirectoryPath, prefix);
     }
 

@@ -1,11 +1,11 @@
-import { existsSync } from "fs";
-import { mkdir, rm, writeFile } from "fs/promises";
-import { join } from "path";
-import { pascalCase } from "../utils";
-import { createMediaFormatInterface, createMediaInterface } from "./builtinInterfaces";
-import ComponentInterface from "./ComponentInterface";
-import Interface from "./Interface";
-import { getApiSchemas, getComponentCategoryFolders, getComponentSchemas } from "./schemaReader";
+import { existsSync } from 'fs';
+import { mkdir, rm, writeFile } from 'fs/promises';
+import { join } from 'path';
+import { pascalCase } from '../utils';
+import { createMediaFormatInterface, createMediaInterface } from './builtinInterfaces';
+import ComponentInterface from './ComponentInterface';
+import Interface from './Interface';
+import { getApiSchemas, getComponentCategoryFolders, getComponentSchemas } from './schemaReader';
 
 export default class InterfaceManager {
     private Interfaces: Record<string, Interface> = {}; // string = strapi name
@@ -14,11 +14,11 @@ export default class InterfaceManager {
     private Options: any;
 
     static BaseOptions = {
-        prefix: "I",
+        prefix: 'I',
         useCategoryPrefix: true,
-        componentPrefix: "",
+        componentPrefix: '',
         componentPrefixOverridesPrefix: false,
-        builtinsPrefix: "", // TODO: make this work
+        builtinsPrefix: '', // TODO: make this work
         builtinsPrefixOverridesPrefix: false // TODO: make this work
     };
 
@@ -35,33 +35,33 @@ export default class InterfaceManager {
         apiSchemas.forEach((schema) => {
             const { name, attributes } = schema;
             const strapiName = `api::${name}.${name}`;
-            const inter = new Interface(name, attributes, "./", this.Options.prefix);
+            const inter = new Interface(name, attributes, './', this.Options.prefix);
             this.Interfaces[strapiName] = inter;
-        })
+        });
 
         const componentSchemas = await componentSchemasPromise;
         componentSchemas.forEach((category) => {
             const categoryName : string = category.category;
             category.schemas.forEach((schema) => {
                 const componentName = schema.name;
-                const strapiName = `${categoryName}.${schema.name}`
-                const componentPrefix = `${this.Options.componentPrefix}${this.Options.useCategoryPrefix ? pascalCase(categoryName) : ""}`;
+                const strapiName = `${categoryName}.${schema.name}`;
+                const componentPrefix = `${this.Options.componentPrefix}${this.Options.useCategoryPrefix ? pascalCase(categoryName) : ''}`;
                 const prefix = this.Options.componentPrefixOverridesPrefix ? componentPrefix : this.Options.prefix + componentPrefix;
                 // TODO: make component interface
                 const inter = new ComponentInterface(componentName, schema.attributes, `./${categoryName}`, categoryName, prefix);
                 this.Interfaces[strapiName] = inter;
-            })
-        })
+            });
+        });
     }
 
     createBuiltinInterfaces() {
-        const outDir = "./builtins"
+        const outDir = './builtins';
         const builtinInterfaces = [];
         builtinInterfaces.push(createMediaInterface(outDir, this.Options.prefix));
         builtinInterfaces.push(createMediaFormatInterface(outDir, this.Options.prefix));
         builtinInterfaces.forEach(inter => {
             this.Interfaces[inter.getStrapiName()] = inter;
-        })
+        });
     }
 
     // Inject dependencies into all interfaces
@@ -75,7 +75,7 @@ export default class InterfaceManager {
                 return this.Interfaces[dependencyStrapiName];
             }).filter((inter) => inter);
             inter.setRelations(interfacesToInject);
-        })
+        });
     }
 
     async makeFolders() {
@@ -85,7 +85,7 @@ export default class InterfaceManager {
                 recursive: true,
             });
         }
-        const promises = []
+        const promises = [];
         const componentCategoriesPromises = componentCategories.map(async (category) => {
             const path = join(this.OutRoot, category);
             if (existsSync(path)) {
@@ -94,9 +94,9 @@ export default class InterfaceManager {
             await mkdir(path);
         });
         promises.push(...componentCategoriesPromises);
-        const builtinsPath = join(this.OutRoot, "builtins");
+        const builtinsPath = join(this.OutRoot, 'builtins');
         if (!existsSync(builtinsPath)) {
-            promises.push(mkdir(join(this.OutRoot, "builtins")));
+            promises.push(mkdir(join(this.OutRoot, 'builtins')));
         }
 
         await Promise.all(promises);
@@ -107,7 +107,7 @@ export default class InterfaceManager {
             const inter = this.Interfaces[strapiName];
             const fileData = inter.toString();
             const filePath = join(this.OutRoot, inter.getRelativeRootPathFile());
-            await writeFile(filePath, fileData)
+            await writeFile(filePath, fileData);
         });
         await Promise.all(writePromises);
     }
@@ -117,8 +117,8 @@ export default class InterfaceManager {
             const inter = this.Interfaces[strapiName];
             return `export * from '${inter.getRelativeRootPath()}'`;
         });
-        const fileData = strings.join("\n");
-        const filePath = join(this.OutRoot, "index.ts");
+        const fileData = strings.join('\n');
+        const filePath = join(this.OutRoot, 'index.ts');
         await writeFile(filePath, fileData);
     }
 
@@ -126,12 +126,12 @@ export default class InterfaceManager {
         try {
             const createInterfacesPromise = this.createInterfaces();
             const makeFoldersPromise = this.makeFolders();
-            this.createBuiltinInterfaces()
+            this.createBuiltinInterfaces();
             await createInterfacesPromise;
             // Create all interfaces before injecting
             this.injectDependencies();
             await makeFoldersPromise;
-            await Promise.all([this.writeInterfaces(), this.writeIndexFile()])
+            await Promise.all([this.writeInterfaces(), this.writeIndexFile()]);
         } catch (err) {
             console.error(err);
         }

@@ -1,6 +1,6 @@
-import { dirname, join, parse, relative } from "path";
-import { pascalCase, prefixDotSlash } from "../utils";
-import Attributes from "./Attributes";
+import { dirname, join, relative } from 'path';
+import { pascalCase, prefixDotSlash } from '../utils';
+import Attributes from './Attributes';
 
 export type RelationNames = Record<string, { name: string, inter: Interface }>;
 
@@ -9,14 +9,14 @@ export default class Interface {
     private Relations: Interface[] = []; // Components and relations
     private RelationNames: RelationNames = {};
     private RelationNamesCounter: Record<string, number> = {};
-    private NamePrefix: string = "";
+    private NamePrefix = '';
     protected Attributes: any;
     private RelativeDirectoryPath: string;
     protected StrapiName: string;
 
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix: string = "") {
+    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix = '') {
         this.BaseName = baseName;
-        this.updateStrapiName()
+        this.updateStrapiName();
         this.NamePrefix = prefix;
         this.Attributes = attributes;
         this.RelativeDirectoryPath = relativeDirectoryPath;
@@ -56,7 +56,7 @@ export default class Interface {
     }
 
     getRelativeRootPathFile() {
-        return `${this.getRelativeRootPath()}.ts`
+        return `${this.getRelativeRootPath()}.ts`;
     }
 
     setRelations(relations: Interface[]) {
@@ -65,8 +65,7 @@ export default class Interface {
         this.Relations.forEach((inter: Interface) => {
             let name = inter.getFullInterfaceName();
             // FIXME: clean up this mess...
-            if (inter.getStrapiName() === this.getStrapiName()) {
-            } else {
+            if (inter.getStrapiName() !== this.getStrapiName()) {
                 // Avoid duplicate names
                 if (name in this.RelationNamesCounter) {
                     name += ++this.RelationNamesCounter[name];
@@ -75,13 +74,13 @@ export default class Interface {
                 }
             }
             this.RelationNames[inter.getStrapiName()] = { name, inter };
-        })
+        });
     }
 
     private getTsImports() {
         return Object.keys(this.RelationNames).map((strapiName: string) => {
             if (strapiName === this.getStrapiName()) {
-                return "";
+                return '';
             }
             const relationName = this.RelationNames[strapiName].name;
             const inter = this.RelationNames[strapiName].inter;
@@ -89,7 +88,7 @@ export default class Interface {
             const fullName = inter.getFullInterfaceName();
             const importNameString = fullName === relationName ? fullName : `${fullName} as ${relationName}`;
             return `import { ${importNameString} } from '${importPath}';`;
-        }).filter(s => s).join("\n");
+        }).filter(s => s).join('\n');
     }
 
     getAttributes() : Attributes {
@@ -104,13 +103,13 @@ export default class Interface {
     getInerfaceString() {
         let str = `export interface ${this.getFullInterfaceName()} {\n`;
         str += this.getInterfaceFieldsString();
-        str += `}`
+        str += '}';
         return str;
     }
 
     getInterfaceFieldsString() {
         let str = '';
-        str += `  id: number;\n`;
+        str += '  id: number;\n';
         str += `  attributes: ${this.attributesToString()}\n`;
         return str;
     }
@@ -120,6 +119,6 @@ export default class Interface {
             this.getTsImports(),
             this.getInerfaceString()
         ];
-        return strings.join("\n")
+        return strings.join('\n');
     }
 }

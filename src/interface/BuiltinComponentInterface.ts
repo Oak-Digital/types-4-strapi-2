@@ -1,8 +1,8 @@
-import ComponentInterface from "./ComponentInterface";
+import ComponentInterface from './ComponentInterface';
 
 export default class BuiltinComponentInterface extends ComponentInterface {
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix: string = "") {
-        super(baseName, attributes, relativeDirectoryPath, "builtins", prefix, {
+    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix = '') {
+        super(baseName, attributes, relativeDirectoryPath, 'builtins', prefix, {
             hasId: false,
             hasComponent: false,
         });
