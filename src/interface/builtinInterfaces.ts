@@ -37,6 +37,13 @@ export function createMediaInterface(directory: string, prefix: string) {
 
     stringFields.forEach(s => mediaAttrs[s] = { type: "string" })
     numberFields.forEach(s => mediaAttrs[s] = { type: "integer" })
+    // const dataAttrs = {
+    //     data: {
+    //         type: "nested",
+    //         fields: mediaAttrs,
+    //         nullable: true,
+    //     },
+    // };
     return new BuiltinInterface("Media", mediaAttrs, directory, prefix)
 }
 

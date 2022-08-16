@@ -9,9 +9,11 @@ export default class Attributes {
         this.RelationNames = relationNames;
     }
 
-    isAttributeOptional(attr: any) {
+    isAttributeOptional(attr: any): boolean {
         // If it is a component / relation / dynamiczone it is always optional due to population
         switch (attr.type) {
+            case "nested":
+                return attr.nullable === true;
             case "component":
             case "dynamiczone":
             case "relation":
@@ -85,7 +87,8 @@ export default class Attributes {
                 str += dependencyComponentName;
                 break;
             case "media":
-                str += this.RelationNames["builtins::Media"].name;
+                const mediaOptional = attr.required !== true ? "?" : "";
+                str += `{ data${mediaOptional}: ${this.RelationNames["builtins::Media"].name}; }`;
                 isArray = attr.multiple ?? false;
                 break;
             case "password":

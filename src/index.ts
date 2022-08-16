@@ -17,7 +17,6 @@ const {
     componentPrefix,
 } = options
 
-console.log(options)
 const manager = new InterfaceManager(out, input, {
     componentPrefix,
 })
