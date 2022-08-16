@@ -76,8 +76,8 @@ export default class Attributes {
             const apiName = attr.target;
             // console.log(this.RelationNames, apiName)
             const dependencyName = this.RelationNames[apiName].name;
-            isArray = attr.relation.endsWith('ToMany');
-            str += dependencyName;
+            const relationMultipleString = attr.relation.endsWith('ToMany') ? '[]' : ' | null';
+            str += `{ data: ${dependencyName}${relationMultipleString}; }`;
             break;
         case 'component':
             const componentName = attr.component;
@@ -88,8 +88,8 @@ export default class Attributes {
             break;
         case 'media':
             const mediaOptional = attr.required !== true ? '?' : '';
-            str += `{ data${mediaOptional}: ${this.RelationNames['builtins::Media'].name}; }`;
-            isArray = attr.multiple ?? false;
+            const mediaMultipleString = attr.multiple ? '[]' : ' | null';
+            str += `{ data${mediaOptional}: ${this.RelationNames['builtins::Media'].name}${mediaMultipleString}; }`;
             break;
         case 'password':
             return null;

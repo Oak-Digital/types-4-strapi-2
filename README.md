@@ -45,6 +45,7 @@ This can be done with the `--out` flag like in the following example.
 
 ### Planned features
 
+* Support for localization
 * Support if you are using other plugins, such as `url-alias`, which should add extra fields for some interfaces.
 
 ## Help
