@@ -87,9 +87,9 @@ export default class Attributes {
             str += dependencyComponentName;
             break;
         case 'media':
-            const mediaOptional = attr.required !== true ? '?' : '';
-            const mediaMultipleString = attr.multiple ? '[]' : ' | null';
-            str += `{ data${mediaOptional}: ${this.RelationNames['builtins::Media'].name}${mediaMultipleString}; }`;
+            const mediaOptional = attr.required !== true ? ' | null' : '';
+            const mediaMultipleString = attr.multiple ? '[]' : mediaOptional;
+            str += `{ data: ${this.RelationNames['builtins::Media'].name}${mediaMultipleString}; }`;
             break;
         case 'password':
             return null;
