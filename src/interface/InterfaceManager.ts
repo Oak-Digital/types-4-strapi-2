@@ -14,7 +14,7 @@ import {
 } from './schemaReader';
 import prettier from 'prettier';
 import { pascalCase } from 'pascal-case';
-import { caseType, caseTypesArray, checkCaseType } from '../case';
+import { caseType, caseTypesArray, changeCase, checkCaseType } from '../case';
 
 export default class InterfaceManager {
     private Interfaces: Record<string, Interface> = {}; // string = strapi name
@@ -33,6 +33,7 @@ export default class InterfaceManager {
         deleteOld: false,
         prettierFile: null,
         fileCaseType: 'pascal' as caseType,
+        folderCaseType: 'kebab' as caseType,
     };
 
     constructor(outRoot: string, strapiSrcRoot: string, options: any = {}) {
@@ -45,6 +46,9 @@ export default class InterfaceManager {
     validateOptions() {
         if (!checkCaseType(this.Options.fileCaseType)) {
             throw new Error(`${this.Options.fileCaseType} is not a supported type, please use one of the following ${caseTypesArray.join(', ')}`);
+        }
+        if (!checkCaseType(this.Options.folderCaseType)) {
+            throw new Error(`${this.Options.folderCaseType} is not a supported type, please use one of the following ${caseTypesArray.join(', ')}`);
         }
     }
 
@@ -93,11 +97,12 @@ export default class InterfaceManager {
                 const prefix = this.Options.componentPrefixOverridesPrefix
                     ? componentPrefix
                     : this.Options.prefix + componentPrefix;
-                // TODO: make component interface
+                const categoryFolderName = changeCase(categoryName, this.Options.folderCaseType);
+                // make component interface
                 const inter = new ComponentInterface(
                     componentName,
                     schema.attributes,
-                    `./${categoryName}`,
+                    `./${categoryFolderName}`,
                     categoryName,
                     this.Options.fileCaseType,
                     prefix
@@ -108,7 +113,8 @@ export default class InterfaceManager {
     }
 
     createBuiltinInterfaces() {
-        const outDir = './builtins';
+        const outDirName = changeCase('builtins', this.Options.folderCaseType);
+        const outDir = `./${outDirName}`;
         const builtinInterfaces = [];
         builtinInterfaces.push(
             createMediaInterface(outDir, this.Options.fileCaseType, this.Options.prefix)
@@ -159,7 +165,8 @@ export default class InterfaceManager {
         const promises = [];
         const componentCategoriesPromises = componentCategories.map(
             async (category) => {
-                const path = join(this.OutRoot, category);
+                const folderName = changeCase(category, this.Options.folderCaseType);
+                const path = join(this.OutRoot, folderName);
                 if (existsSync(path)) {
                     return;
                 }
@@ -167,9 +174,10 @@ export default class InterfaceManager {
             }
         );
         promises.push(...componentCategoriesPromises);
-        const builtinsPath = join(this.OutRoot, 'builtins');
+        const builintsFolderName = changeCase('builtins', this.Options.folderCaseType);
+        const builtinsPath = join(this.OutRoot, builintsFolderName);
         if (!existsSync(builtinsPath)) {
-            promises.push(mkdir(join(this.OutRoot, 'builtins')));
+            promises.push(mkdir(builtinsPath));
         }
 
         await Promise.all(promises);

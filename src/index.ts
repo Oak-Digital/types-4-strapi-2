@@ -10,6 +10,7 @@ program
     .option('--component-prefix <prefix>', 'A prefix for components', '')
     .option('-D, --delete-old', 'CAUTION: This option is equivalent to running rm -rf on the output directory first')
     .option('--file-case <case>', 'Which case to use for generated files', 'pascal')
+    .option('--folder-case <case>', 'Which case to use for generated folders', 'kebab')
     .option('--prettier <file>', 'The prettier config file to use for formatting typescript interfaces');
 
 program.parse();
@@ -21,6 +22,7 @@ const {
     prettier: prettierFile,
     deleteOld,
     fileCase: fileCaseType,
+    folderCase: folderCaseType,
 } = options;
 
 const manager = new InterfaceManager(out, input, {
@@ -28,6 +30,7 @@ const manager = new InterfaceManager(out, input, {
     prettierFile,
     deleteOld,
     fileCaseType,
+    folderCaseType,
 });
 manager.run().catch((err) => {
     console.error(err);
