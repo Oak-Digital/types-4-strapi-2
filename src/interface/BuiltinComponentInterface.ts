@@ -1,11 +1,26 @@
+import { caseType } from '../case';
 import ComponentInterface from './ComponentInterface';
 
 export default class BuiltinComponentInterface extends ComponentInterface {
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix = '') {
-        super(baseName, attributes, relativeDirectoryPath, 'builtins', prefix, {
-            hasId: false,
-            hasComponent: false,
-        });
+    constructor(
+        baseName: string,
+        attributes: any,
+        relativeDirectoryPath: string,
+        fileCase: caseType,
+        prefix = ''
+    ) {
+        super(
+            baseName,
+            attributes,
+            relativeDirectoryPath,
+            'builtins',
+            fileCase,
+            prefix,
+            {
+                hasId: false,
+                hasComponent: false,
+            }
+        );
     }
 
     override updateStrapiName() {

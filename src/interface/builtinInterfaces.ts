@@ -1,7 +1,8 @@
+import { caseType } from '../case';
 import BuiltinComponentInterface from './BuiltinComponentInterface';
 import BuiltinInterface from './BuiltinInterface';
 
-export function createMediaInterface(directory: string, prefix: string) {
+export function createMediaInterface(directory: string, caseTypeName: caseType, prefix: string) {
     const stringFields = [
         'name',
         'alternativeText',
@@ -48,10 +49,10 @@ export function createMediaInterface(directory: string, prefix: string) {
     //         nullable: true,
     //     },
     // };
-    return new BuiltinInterface('Media', mediaAttrs, directory, prefix);
+    return new BuiltinInterface('Media', mediaAttrs, directory, caseTypeName, prefix);
 }
 
-export function createMediaFormatInterface(directory: string, prefix: string) {
+export function createMediaFormatInterface(directory: string, caseTypeName: caseType, prefix: string) {
     const stringFields = [
         'name',
         'hash',
@@ -73,5 +74,5 @@ export function createMediaFormatInterface(directory: string, prefix: string) {
     numberFields.forEach(s => {
         mediaAttrs[s] = { type: 'integer' };
     });
-    return new BuiltinComponentInterface('MediaFormat', mediaAttrs, directory, prefix);
+    return new BuiltinComponentInterface('MediaFormat', mediaAttrs, directory, caseTypeName, prefix);
 }

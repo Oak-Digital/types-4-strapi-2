@@ -1,8 +1,15 @@
+import { caseType } from '../case';
 import Interface from './Interface';
 
 export default class BuiltinInterface extends Interface {
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix = '') {
-        super(baseName, attributes, relativeDirectoryPath, prefix);
+    constructor(
+        baseName: string,
+        attributes: any,
+        relativeDirectoryPath: string,
+        fileCase: caseType,
+        prefix = ''
+    ) {
+        super(baseName, attributes, relativeDirectoryPath, fileCase, prefix);
     }
 
     override updateStrapiName() {

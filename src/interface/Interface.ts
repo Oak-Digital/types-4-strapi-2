@@ -1,6 +1,8 @@
 import { dirname, join, relative } from 'path/posix';
-import { pascalCase, prefixDotSlash } from '../utils';
+import { caseType, changeCase } from '../case';
+import { prefixDotSlash } from '../utils';
 import Attributes from './Attributes';
+import { camelCase, pascalCase, dotCase, snakeCase, capitalCase, constantCase, paramCase } from 'change-case';
 
 export type RelationNames = Record<string, { name: string, inter: Interface }>;
 
@@ -13,13 +15,15 @@ export default class Interface {
     protected Attributes: any;
     private RelativeDirectoryPath: string;
     protected StrapiName: string;
+    protected FileCase: caseType;
 
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, prefix = '') {
+    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, fileCaseType : caseType = "pascal", prefix = '') {
         this.BaseName = baseName;
         this.updateStrapiName();
         this.NamePrefix = prefix;
         this.Attributes = attributes;
         this.RelativeDirectoryPath = relativeDirectoryPath;
+        this.FileCase = fileCaseType;
     }
 
     protected updateStrapiName() {
@@ -44,9 +48,13 @@ export default class Interface {
         return `${this.NamePrefix}${pascalName}`;
     }
 
+    getFileBaseName() {
+        return changeCase(this.getBaseName(), this.FileCase);
+    }
+
     // For typescript import from index file
     getRelativeRootPath() {
-        const path = join(this.RelativeDirectoryPath, this.getBaseName());
+        const path = join(this.RelativeDirectoryPath, this.getFileBaseName());
         return prefixDotSlash(path);
     }
 

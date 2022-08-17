@@ -1,3 +1,4 @@
+import { caseType } from '../case';
 import Interface from './Interface';
 
 export default class ComponentInterface extends Interface {
@@ -7,8 +8,16 @@ export default class ComponentInterface extends Interface {
         hasComponent: true,
     };
 
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, category: string, prefix = '', options: Record<string, any> = {}) {
-        super(baseName, attributes, relativeDirectoryPath, prefix);
+    constructor(
+        baseName: string,
+        attributes: any,
+        relativeDirectoryPath: string,
+        category: string,
+        fileCase: caseType,
+        prefix = '',
+        options: Record<string, any> = {}
+    ) {
+        super(baseName, attributes, relativeDirectoryPath, fileCase, prefix);
         this.Category = category;
         // this.Attributes.id = {
         //     type: "number", // Components have a id field with a number
