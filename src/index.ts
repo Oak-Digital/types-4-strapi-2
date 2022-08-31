@@ -7,6 +7,7 @@ program
 program
     .option('-i, --in <dir>', 'The src directory for strapi', './src')
     .option('-o, --out <dir>', 'The output directory to output the types to', './types')
+    .option('--prefix <prefix>', 'A prefix for all generated interfaces', 'I')
     .option('--component-prefix <prefix>', 'A prefix for components', '')
     .option('-D, --delete-old', 'CAUTION: This option is equivalent to running rm -rf on the output directory first')
     .option('--file-case <case>', 'Which case to use for generated files', 'pascal')
@@ -19,6 +20,7 @@ const {
     in: input,
     out,
     componentPrefix,
+    prefix,
     prettier: prettierFile,
     deleteOld,
     fileCase: fileCaseType,
@@ -27,6 +29,7 @@ const {
 
 const manager = new InterfaceManager(out, input, {
     componentPrefix,
+    prefix,
     prettierFile,
     deleteOld,
     fileCaseType,
