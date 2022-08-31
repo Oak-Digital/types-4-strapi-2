@@ -70,7 +70,7 @@ To build this project, use the following command
 npm run build
 ```
 
-## Publihsing
+## Publishing
 
 ```bash
 npm run build
