@@ -75,7 +75,7 @@ export default class Attributes {
         case 'relation':
             const apiName = attr.target;
             // console.log(this.RelationNames, apiName)
-            const dependencyName = this.RelationNames[apiName].name;
+            const dependencyName = this.RelationNames[apiName]?.name ?? 'any';
             const relationMultipleString = attr.relation.endsWith('ToMany') ? '[]' : ' | null';
             str += `{ data: ${dependencyName}${relationMultipleString}; }`;
             break;
