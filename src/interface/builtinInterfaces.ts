@@ -28,8 +28,10 @@ export function createMediaInterface(directory: string, caseTypeName: caseType, 
         formats: {
             // types-4-strapi-2 specific
             type: 'nested',
+            nullable: true,
             fields: {
                 thumbnail: mediaFormat,
+                large: mediaFormat,
                 medium: mediaFormat,
                 small: mediaFormat,
             },

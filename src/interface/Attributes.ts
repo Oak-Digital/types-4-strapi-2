@@ -69,8 +69,9 @@ export default class Attributes {
         case 'nested':
             // Be careful with recursion
             // console.log(attr);
+            const nullableString = (attr?.nullable ?? false) ? ' | null' : '';
             const newAttrs = new Attributes(attr.fields, this.RelationNames);
-            str += newAttrs.toString();
+            str += newAttrs.toString() + nullableString;
             break;
         case 'relation':
             const apiName = attr.target;
