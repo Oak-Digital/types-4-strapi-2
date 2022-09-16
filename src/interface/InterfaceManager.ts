@@ -61,7 +61,10 @@ export default class InterfaceManager {
             return;
         }
         const resolved = await prettier.resolveConfig(
-            this.Options.prettierFile
+            this.Options.prettierFile,
+            {
+                editorconfig: true,
+            }
         );
         this.PrettierOptions = Object.assign({}, defaultOptions, resolved);
     }
