@@ -44,6 +44,9 @@ export default class Attributes {
             case 'media':
                 dependencyNames.push('builtins::Media');
                 break;
+            case 'dynamiczone':
+                dependencyNames.push(...attr.components);
+                break;
             default:
                 continue;
             }
@@ -100,6 +103,15 @@ export default class Attributes {
             enums.push('null');
             const typeString = enums.join(' | ');
             str += typeString;
+            break;
+        case 'dynamiczone':
+            // console.log(attr.components);
+            const relations = attr.components
+                .map((componentName: string) => this.RelationNames[componentName].name);
+            // console.log(relations);
+            const relationsString = relations.join(' | ');
+            // console.log(relationsString);
+            str += `Array<${relationsString}>`;
             break;
         case 'string':
         case 'text':
