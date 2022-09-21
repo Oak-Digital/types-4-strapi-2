@@ -57,7 +57,7 @@ This can be done with the `--out` flag like in the following example.
 |-----------------------------|--------------------------------------------------------------------------------------|-------------|
 | -i, --in <dir>              | The src directory for strapi                                                         | `./src`     |
 | -o, --out <dir>             | The output directory to output the types to                                          | `./types`   |
-| -prefix                     | A prefix for all generated interfaces                                                | `I`         |
+| --prefix <prefix>           | A prefix for all generated interfaces                                                | `I`         |
 | --component-prefix <prefix> | A prefix for components                                                              | none        |
 | -D, --delete-old            | CAUTION: This option is equivalent to running `rm -rf` on the output directory first | `false`     |
 | --prettier <file>           | The prettier config file to use for formatting TypeScript interfaces                 | none        |
