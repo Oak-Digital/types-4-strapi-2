@@ -62,6 +62,49 @@ This can be done with the `--out` flag like in the following example.
 | -D, --delete-old            | CAUTION: This option is equivalent to running `rm -rf` on the output directory first | `false`     |
 | --prettier <file>           | The prettier config file to use for formatting TypeScript interfaces                 | none        |
 
+## Tips and tricks
+
+### Generate interfaces as soon as you create/modify/delete new components or content types
+
+You can make an extension for your strapi project to generate the new typescript interfaces as soon as they are created with strapi.
+If you followed the step of adding a script to your `package.json`, you can easily make an extension that just calls `npm run types`.
+An example of how this can be done is shown in the following snippet.
+
+```typescript
+// src/extensions/content-type-builder/strapi-server.ts
+import { exec } from "child_process";
+
+export default (plugin: any) => {
+  const componentRunAfter = [
+    "createComponent",
+    "deleteComponent",
+    "updateComponent",
+  ];
+  const contentTypesRunAfter = [
+    "createContentType",
+    "updateContentType",
+    "deleteContentType",
+  ];
+  componentRunAfter.forEach((name) => {
+    const oldFunc = plugin.controllers.components[name];
+    plugin.controllers.components[name] = async (ctx: any) => {
+      await oldFunc(ctx);
+      exec("npm run types");
+      return ctx
+    }
+  })
+  contentTypesRunAfter.forEach((name) => {
+    const oldFunc = plugin.controllers['content-types'][name];
+    plugin.controllers["content-types"][name] = async (ctx: any) => {
+      await oldFunc(ctx);
+      exec("npm run types");
+      return ctx
+    }
+  })
+  return plugin;
+}
+```
+
 ## Building
 
 To build this project, use the following command
