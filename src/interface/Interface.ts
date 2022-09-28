@@ -17,7 +17,7 @@ export default class Interface {
     protected StrapiName: string;
     protected FileCase: caseType;
 
-    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, fileCaseType : caseType = "pascal", prefix = '') {
+    constructor(baseName: string, attributes: any, relativeDirectoryPath: string, fileCaseType : caseType = 'pascal', prefix = '') {
         this.BaseName = baseName;
         this.updateStrapiName();
         this.NamePrefix = prefix;
