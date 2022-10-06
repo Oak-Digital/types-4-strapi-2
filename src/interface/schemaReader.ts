@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path/posix';
 import { readDirFiltered } from '../utils';
@@ -19,6 +20,10 @@ export async function getApiFolders(strapiSrcRoot: string) {
 
 export async function getComponentCategoryFolders(strapiSrcRoot: string) {
     const path = join(strapiSrcRoot, 'components');
+    // If there exists no components, just fallback to an empty array.
+    if (!existsSync(path)) {
+        return [];
+    }
     const folders = await readDirFiltered(path);
     return folders;
 }
