@@ -65,6 +65,8 @@ export default class Attributes {
 
     attributeToString(attrName: string, attr: any) {
         const optionalString = this.isAttributeOptional(attr) ? '?' : '';
+        const orNull = ' | null';
+        const requiredString = attr.required !== true ? orNull : '';
         let str = `    ${attrName}${optionalString}: `;
         let isArray  = false;
         switch (attr.type) {
@@ -80,7 +82,7 @@ export default class Attributes {
             const apiName = attr.target;
             // console.log(this.RelationNames, apiName)
             const dependencyName = this.RelationNames[apiName]?.name ?? 'any';
-            const relationMultipleString = attr.relation.endsWith('ToMany') ? '[]' : ' | null';
+            const relationMultipleString = attr.relation.endsWith('ToMany') ? '[]' : orNull;
             str += `{ data: ${dependencyName}${relationMultipleString}; }`;
             break;
         case 'component':
@@ -91,8 +93,7 @@ export default class Attributes {
             str += dependencyComponentName;
             break;
         case 'media':
-            const mediaOptional = attr.required !== true ? ' | null' : '';
-            const mediaMultipleString = attr.multiple ? '[]' : mediaOptional;
+            const mediaMultipleString = attr.multiple ? '[]' : requiredString;
             str += `{ data: ${this.RelationNames['builtins::Media'].name}${mediaMultipleString}; }`;
             break;
         case 'password':
@@ -119,20 +120,24 @@ export default class Attributes {
         case 'email':
         case 'uid':
             str += 'string';
+            str += requiredString;
             break;
         case 'integer':
         case 'biginteger':
         case 'decimal':
         case 'float':
             str += 'number';
+            str += requiredString;
             break;
         case 'date':
         case 'datetime':
         case 'time':
             str += 'Date';
+            str += requiredString;
             break;
         case 'boolean':
             str += attr.type;
+            str += requiredString;
             break;
         case 'json':
         default:
