@@ -5,6 +5,10 @@ This can be useful if you have a frontend written with TypeScript to make sure y
 
 types-4-strapi-2 is a rewrite of [francescolorenzetti/types-4-strapi](https://github.com/francescolorenzetti/types-4-strapi) written in TypeScript, with the goal of being much easier to extend and maintain.
 
+## Requirements
+
+* Node `>=v16`
+
 ## Getting started
 
 Install the script for your project:
