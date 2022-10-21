@@ -1,6 +1,6 @@
 {
   "name": "@oak-digital/types-4-strapi-2",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Typescript interface generator for Strapi 4 models",
   "bin": {
     "t4s": "./bin/index.js"
