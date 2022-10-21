@@ -17,10 +17,7 @@ export function createMediaInterface(
         'url',
         'provider',
     ];
-    const stringFields = [
-        'previewUrl',
-        'provider_metadata',
-    ];
+    const stringFields = ['previewUrl', 'provider_metadata'];
     const numberFields = ['width', 'height', 'size'];
     const mediaFormat = {
         type: 'component',
@@ -71,15 +68,19 @@ export function createMediaFormatInterface(
     caseTypeName: caseType,
     prefix: string
 ) {
-    const stringFields = ['name', 'hash', 'ext', 'mime', 'path', 'url'];
+    const stringRequiredFields = ['name', 'hash', 'ext', 'mime', 'url'];
+    const stringFields = ['path'];
     const numberFields = ['width', 'height', 'size'];
     const mediaAttrs = {};
 
+    stringRequiredFields.forEach((s) => {
+        mediaAttrs[s] = { type: 'string', required: true };
+    });
     stringFields.forEach((s) => {
         mediaAttrs[s] = { type: 'string' };
     });
     numberFields.forEach((s) => {
-        mediaAttrs[s] = { type: 'integer' };
+        mediaAttrs[s] = { type: 'integer', required: true };
     });
     return new BuiltinComponentInterface(
         'MediaFormat',
