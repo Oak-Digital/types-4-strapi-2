@@ -16,7 +16,7 @@ export const caseTypesArray = [
     'pascal',
     'constant',
     'kebab',
-];
+] as const;
 
 export type caseType = typeof caseTypesArray[number];
 
