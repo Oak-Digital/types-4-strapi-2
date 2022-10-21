@@ -15,13 +15,18 @@ import {
 import prettier from 'prettier';
 import { pascalCase } from 'pascal-case';
 import { caseType, caseTypesArray, changeCase, checkCaseType } from '../case';
+import EventEmitter from 'events';
+import { Events } from '../events';
+import { registerPlugins } from '../plugins';
+import { supportedPluginNames, SupportedPluginNamesType } from '../plugins/types';
 
 export default class InterfaceManager {
     private Interfaces: Record<string, Interface> = {}; // string = strapi name
     private OutRoot: string;
     private StrapiSrcRoot: string;
-    private Options: any;
+    private Options: typeof InterfaceManager.BaseOptions;
     private PrettierOptions: any;
+    public eventEmitter: EventEmitter = new EventEmitter();
 
     static BaseOptions = {
         prefix: 'I',
@@ -34,6 +39,7 @@ export default class InterfaceManager {
         prettierFile: null,
         fileCaseType: 'pascal' as caseType,
         folderCaseType: 'kebab' as caseType,
+        enabledPlugins: [],
     };
 
     constructor(outRoot: string, strapiSrcRoot: string, options: any = {}) {
@@ -41,6 +47,12 @@ export default class InterfaceManager {
         this.StrapiSrcRoot = strapiSrcRoot;
         this.Options = Object.assign({}, InterfaceManager.BaseOptions, options);
         this.validateOptions();
+        this.registerPlugins();
+    }
+
+    registerPlugins() {
+        const pluginNames = new Set<SupportedPluginNamesType>(this.Options.enabledPlugins);
+        registerPlugins(pluginNames, this.eventEmitter);
     }
 
     validateOptions() {
@@ -50,6 +62,13 @@ export default class InterfaceManager {
         if (!checkCaseType(this.Options.folderCaseType)) {
             throw new Error(`${this.Options.folderCaseType} is not a supported type, please use one of the following ${caseTypesArray.join(', ')}`);
         }
+
+        this.Options.enabledPlugins.forEach((enabledPlugin) => {
+            if (!supportedPluginNames.includes(enabledPlugin)) {
+                throw new Error(`${enabledPlugin} is not a supported plugin, please open an issue on https://github.com/Oak-Digital/types-4-strapi-2 or only use the following plugins [${supportedPluginNames.join(', ')}]`);
+            }
+        });
+
     }
 
     async loadPrettierConfig() {
@@ -69,10 +88,31 @@ export default class InterfaceManager {
         this.PrettierOptions = Object.assign({}, defaultOptions, resolved);
     }
 
-    async createInterfaces() {
+    async readSchemas() {
+        const apiSchemasPre = [];
+        const componentSchemasPre = [];
         const apiSchemasPromise = getApiSchemas(this.StrapiSrcRoot);
         const componentSchemasPromise = getComponentSchemas(this.StrapiSrcRoot);
-        const apiSchemas = await apiSchemasPromise;
+        this.eventEmitter.emit(Events.BeforeReadSchema, {
+            apiSchemas: apiSchemasPre,
+            componentSchemas: componentSchemasPre,
+        });
+
+        const [apiSchemas, componentSchemas] = await Promise.all([apiSchemasPromise, componentSchemasPromise]);
+
+        const newObject ={
+            apiSchemas: [...apiSchemasPre, ...apiSchemas],
+            componentSchemas: [...componentSchemasPre, ...componentSchemas],
+        };
+
+        this.eventEmitter.emit(Events.AfterReadSchema, newObject);
+
+        return newObject;
+    }
+
+    async createInterfaces() {
+        const { apiSchemas, componentSchemas } = await this.readSchemas();
+
         apiSchemas.forEach((schema) => {
             const { name, attributes } = schema;
             const strapiName = `api::${name}.${name}`;
@@ -86,7 +126,6 @@ export default class InterfaceManager {
             this.Interfaces[strapiName] = inter;
         });
 
-        const componentSchemas = await componentSchemasPromise;
         componentSchemas.forEach((category) => {
             const categoryName: string = category.category;
             category.schemas.forEach((schema) => {

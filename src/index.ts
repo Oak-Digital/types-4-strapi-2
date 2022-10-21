@@ -12,6 +12,7 @@ program
     .option('-D, --delete-old', 'CAUTION: This option is equivalent to running rm -rf on the output directory first')
     .option('--file-case <case>', 'Which case to use for generated files', 'pascal')
     .option('--folder-case <case>', 'Which case to use for generated folders', 'kebab')
+    .option('--plugins <plugins...>', 'A list of enabled plugins in the target strapi project that modify content-types')
     .option('--prettier <file>', 'The prettier config file to use for formatting typescript interfaces');
 
 program.parse();
@@ -25,6 +26,7 @@ const {
     deleteOld,
     fileCase: fileCaseType,
     folderCase: folderCaseType,
+    plugins,
 } = options;
 
 const manager = new InterfaceManager(out, input, {
@@ -34,6 +36,7 @@ const manager = new InterfaceManager(out, input, {
     deleteOld,
     fileCaseType,
     folderCaseType,
+    enabledPlugins: plugins,
 });
 manager.run().catch((err) => {
     console.error(err);
