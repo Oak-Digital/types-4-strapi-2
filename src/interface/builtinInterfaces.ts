@@ -2,8 +2,12 @@ import { caseType } from '../case';
 import BuiltinComponentInterface from './BuiltinComponentInterface';
 import BuiltinInterface from './BuiltinInterface';
 
-export function createMediaInterface(directory: string, caseTypeName: caseType, prefix: string) {
-    const stringFields = [
+export function createMediaInterface(
+    directory: string,
+    caseTypeName: caseType,
+    prefix: string
+) {
+    const stringRequiredFields = [
         'name',
         'alternativeText',
         'caption',
@@ -11,14 +15,13 @@ export function createMediaInterface(directory: string, caseTypeName: caseType, 
         'ext',
         'mime',
         'url',
-        'previewUrl',
         'provider',
     ];
-    const numberFields = [
-        'width',
-        'height',
-        'size',
+    const stringFields = [
+        'previewUrl',
+        'provider_metadata',
     ];
+    const numberFields = ['width', 'height', 'size'];
     const mediaFormat = {
         type: 'component',
         repeatable: false,
@@ -38,11 +41,14 @@ export function createMediaInterface(directory: string, caseTypeName: caseType, 
         },
     };
 
-    stringFields.forEach(s => {
+    stringRequiredFields.forEach((s) => {
+        mediaAttrs[s] = { type: 'string', required: true };
+    });
+    stringFields.forEach((s) => {
         mediaAttrs[s] = { type: 'string' };
     });
-    numberFields.forEach(s => {
-        mediaAttrs[s] = { type: 'integer' };
+    numberFields.forEach((s) => {
+        mediaAttrs[s] = { type: 'integer', required: true };
     });
     // const dataAttrs = {
     //     data: {
@@ -51,30 +57,35 @@ export function createMediaInterface(directory: string, caseTypeName: caseType, 
     //         nullable: true,
     //     },
     // };
-    return new BuiltinInterface('Media', mediaAttrs, directory, caseTypeName, prefix);
+    return new BuiltinInterface(
+        'Media',
+        mediaAttrs,
+        directory,
+        caseTypeName,
+        prefix
+    );
 }
 
-export function createMediaFormatInterface(directory: string, caseTypeName: caseType, prefix: string) {
-    const stringFields = [
-        'name',
-        'hash',
-        'ext',
-        'mime',
-        'path',
-        'url',
-    ];
-    const numberFields = [
-        'width',
-        'height',
-        'size',
-    ];
+export function createMediaFormatInterface(
+    directory: string,
+    caseTypeName: caseType,
+    prefix: string
+) {
+    const stringFields = ['name', 'hash', 'ext', 'mime', 'path', 'url'];
+    const numberFields = ['width', 'height', 'size'];
     const mediaAttrs = {};
 
-    stringFields.forEach(s => {
+    stringFields.forEach((s) => {
         mediaAttrs[s] = { type: 'string' };
     });
-    numberFields.forEach(s => {
+    numberFields.forEach((s) => {
         mediaAttrs[s] = { type: 'integer' };
     });
-    return new BuiltinComponentInterface('MediaFormat', mediaAttrs, directory, caseTypeName, prefix);
+    return new BuiltinComponentInterface(
+        'MediaFormat',
+        mediaAttrs,
+        directory,
+        caseTypeName,
+        prefix
+    );
 }
