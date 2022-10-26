@@ -132,7 +132,7 @@ export default class Attributes {
         case 'date':
         case 'datetime':
         case 'time':
-            str += 'Date';
+            str += 'string';
             str += requiredString;
             break;
         case 'boolean':
