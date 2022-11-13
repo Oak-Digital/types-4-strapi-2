@@ -39,13 +39,22 @@ export default class InterfaceManager {
         prettierFile: null,
         fileCaseType: 'pascal' as caseType,
         folderCaseType: 'kebab' as caseType,
-        enabledPlugins: [],
+        enabledPlugins: <SupportedPluginNamesType[]>[],
     };
 
-    constructor(outRoot: string, strapiSrcRoot: string, options: any = {}) {
+    constructor(outRoot: string, strapiSrcRoot: string, options: Partial<typeof InterfaceManager['BaseOptions']> = {}) {
         this.OutRoot = outRoot;
         this.StrapiSrcRoot = strapiSrcRoot;
-        this.Options = Object.assign({}, InterfaceManager.BaseOptions, options);
+        this.Options = {
+            ...InterfaceManager.BaseOptions,
+            ...options,
+        };
+        // Make sure all options are set
+        Object.keys(this.Options).map((name) => {
+            if (this.Options[name] === undefined) {
+                this.Options[name] = InterfaceManager.BaseOptions[name];
+            }
+        });
         this.validateOptions();
         this.registerPlugins();
     }
