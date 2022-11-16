@@ -101,7 +101,9 @@ export default class Attributes {
         case 'enumeration':
             const hasDefault = 'default' in attr;
             const enums = attr.enum.map((en: string) => `"${en}"`);
-            enums.push('null');
+            if (attr.required !== true) {
+                enums.push('null');
+            }
             const typeString = enums.join(' | ');
             str += typeString;
             break;
