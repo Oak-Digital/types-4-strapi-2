@@ -1,4 +1,4 @@
-import { RelationNames } from './Interface';
+import { RelationNames } from '../interface/Interface';
 
 export default class Attributes {
     Attrs: Record<string, Record<string, any>>;

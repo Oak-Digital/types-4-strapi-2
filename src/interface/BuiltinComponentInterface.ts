@@ -1,4 +1,4 @@
-import { caseType } from '../case';
+import { caseType } from '../utils/casing';
 import ComponentInterface from './ComponentInterface';
 
 export default class BuiltinComponentInterface extends ComponentInterface {

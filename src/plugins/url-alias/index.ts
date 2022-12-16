@@ -1,5 +1,5 @@
-import EventEmitter from "events";
-import { Events, SchemasType } from "../../events";
+import EventEmitter from 'events';
+import { Events, SchemasType } from '../../events';
 
 const addUrlAliasToAllContentTypes = ({ apiSchemas }: SchemasType) => {
     apiSchemas.forEach((schema) => {

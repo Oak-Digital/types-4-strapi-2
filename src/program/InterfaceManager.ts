@@ -4,17 +4,17 @@ import { join } from 'path/posix';
 import {
     createMediaFormatInterface,
     createMediaInterface,
-} from './builtinInterfaces';
-import ComponentInterface from './ComponentInterface';
-import Interface from './Interface';
+} from '../interface/builtinInterfaces';
+import ComponentInterface from '../interface/ComponentInterface';
+import Interface from '../interface/Interface';
 import {
     getApiSchemas,
     getComponentCategoryFolders,
     getComponentSchemas,
-} from './schemaReader';
+} from '../content-types/reader';
 import prettier from 'prettier';
 import { pascalCase } from 'pascal-case';
-import { caseType, caseTypesArray, changeCase, checkCaseType } from '../case';
+import { caseType, caseTypesArray, changeCase, checkCaseType } from '../utils/casing/';
 import EventEmitter from 'events';
 import { Events } from '../events';
 import { registerPlugins } from '../plugins';

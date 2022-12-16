@@ -1,4 +1,4 @@
-import { caseType } from '../case';
+import { caseType } from '../utils/casing';
 import BuiltinComponentInterface from './BuiltinComponentInterface';
 import BuiltinInterface from './BuiltinInterface';
 

@@ -1,4 +1,4 @@
-import { caseType } from '../case';
+import { caseType } from '../utils/casing';
 import Interface from './Interface';
 
 export default class ComponentInterface extends Interface {

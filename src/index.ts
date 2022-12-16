@@ -1,5 +1,5 @@
 import { program } from 'commander';
-import InterfaceManager from './interface/InterfaceManager';
+import InterfaceManager from './program/InterfaceManager';
 
 program
     .name('t4s');

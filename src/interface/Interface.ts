@@ -1,7 +1,7 @@
 import { dirname, join, relative } from 'path/posix';
-import { caseType, changeCase } from '../case';
+import { caseType, changeCase } from '../utils/casing';
 import { prefixDotSlash } from '../utils';
-import Attributes from './Attributes';
+import Attributes from '../attributes/Attributes';
 import { camelCase, pascalCase, dotCase, snakeCase, capitalCase, constantCase, paramCase } from 'change-case';
 
 export type RelationNames = Record<string, { name: string, inter: Interface }>;
