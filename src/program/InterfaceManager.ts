@@ -27,9 +27,13 @@ import {
     SupportedPluginNamesType,
 } from '../plugins/types';
 import { PluginManager } from '../plugins/PluginManager';
+import { File } from '../file/File';
+import { createExtraTypes } from '../extra-types/createExtraTypes';
 
 export default class InterfaceManager {
+    // TODO: remove Interfaces
     private Interfaces: Record<string, Interface> = {}; // string = strapi name
+    private Files: Record<string, File> = {}; // string = strapi name
     private OutRoot: string;
     private StrapiSrcRoot: string;
     private Options: typeof InterfaceManager.BaseOptions;
@@ -172,6 +176,7 @@ export default class InterfaceManager {
                 this.Options.prefix
             );
             this.Interfaces[strapiName] = inter;
+            this.Files[strapiName] = inter;
         });
 
         componentSchemas.forEach((category) => {
@@ -201,11 +206,13 @@ export default class InterfaceManager {
                     prefix
                 );
                 this.Interfaces[strapiName] = inter;
+                this.Files[strapiName] = inter;
             });
         });
     }
 
     createBuiltinInterfaces() {
+        // Interfaces
         const outDirName = changeCase('builtins', this.Options.folderCaseType);
         const outDir = `./${outDirName}`;
         const builtinInterfaces = [];
@@ -225,22 +232,33 @@ export default class InterfaceManager {
         );
         builtinInterfaces.forEach((inter) => {
             this.Interfaces[inter.getStrapiName()] = inter;
+            this.Files[inter.getStrapiName()] = inter;
+        });
+
+        // Types
+        const types = [];
+        types.push(
+            ...createExtraTypes()
+        );
+
+        types.forEach((t) => {
+            this.Files[t.getStrapiName()] = t;
         });
     }
 
     // Inject dependencies into all interfaces
     injectDependencies() {
         // console.log("Injecting dependencies")
-        Object.keys(this.Interfaces).forEach((strapiName: string) => {
-            const inter = this.Interfaces[strapiName];
-            const dependencies = inter.getDependencies();
+        Object.keys(this.Files).forEach((strapiName: string) => {
+            const file = this.Files[strapiName];
+            const dependencies = file.getDependencies();
             // console.log(`Interfaces for ${inter.getStrapiName()} are`)
             const interfacesToInject = dependencies
                 .map((dependencyStrapiName: string) => {
-                    return this.Interfaces[dependencyStrapiName];
+                    return this.Files[dependencyStrapiName];
                 })
                 .filter((inter) => inter);
-            inter.setRelations(interfacesToInject);
+            file.setRelations(interfacesToInject);
         });
     }
 
@@ -291,17 +309,25 @@ export default class InterfaceManager {
     }
 
     async writeInterfaces() {
-        const writePromises = Object.keys(this.Interfaces).map(
+        /* const types = [ */
+        /*     requiredByString, */
+        /*     extractNestedString, */
+        /*     extractFlatString, */
+        /* ]; */
+        /* const writeTypesPromises = types.map((t) => { */
+        /*      */
+        /* }); */
+        const writePromises = Object.keys(this.Files).map(
             async (strapiName) => {
-                const inter = this.Interfaces[strapiName];
-                const fileData = inter.toString();
+                const file = this.Files[strapiName];
+                const fileData = file.toString();
                 const formattedFileData = prettier.format(
                     fileData,
                     this.PrettierOptions
                 );
                 const filePath = join(
                     this.OutRoot,
-                    inter.getRelativeRootPathFile()
+                    file.getRelativeRootPathFile()
                 );
                 await writeFile(filePath, formattedFileData);
             }
@@ -310,9 +336,9 @@ export default class InterfaceManager {
     }
 
     async writeIndexFile() {
-        const strings = Object.keys(this.Interfaces).map(
+        const strings = Object.keys(this.Files).map(
             (strapiName: string) => {
-                const inter = this.Interfaces[strapiName];
+                const inter = this.Files[strapiName];
                 return `export * from '${inter.getRelativeRootPath()}'`;
             }
         );
