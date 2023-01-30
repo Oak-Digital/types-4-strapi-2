@@ -1,6 +1,7 @@
 {
     "parser": "typescript",
     "semi": true,
+    "indent": 4,
     "singleQuote": true,
     "bracketSameLine": false,
     "trailingComma": "es5"

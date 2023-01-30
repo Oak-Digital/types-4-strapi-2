@@ -32,10 +32,6 @@
         "no-return-await": ["error"],
         "no-var": ["error"],
         "no-cond-assign": ["error", "always"],
-        "indent": [
-            "error",
-            4
-        ],
         "linebreak-style": [
             "error",
             "unix"
