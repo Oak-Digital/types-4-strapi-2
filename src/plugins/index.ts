@@ -1,12 +1,12 @@
-import EventEmitter from 'events';
 import { SupportedPluginNamesType } from './types';
 import registerUrlAlias from './url-alias';
+import { PluginManager } from './PluginManager';
 
-export const registerPlugins = (
+export const registerBuiltinPlugins = (
+    pluginManager: PluginManager,
     pluginNames: Set<SupportedPluginNamesType>,
-    eventEmitter: EventEmitter
 ) => {
     if (pluginNames.has('url-alias')) {
-        registerUrlAlias(eventEmitter);
+        pluginManager.registerPlugin(registerUrlAlias());
     }
 };

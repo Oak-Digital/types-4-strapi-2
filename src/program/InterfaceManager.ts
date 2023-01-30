@@ -14,11 +14,19 @@ import {
 } from '../content-types/reader';
 import prettier from 'prettier';
 import { pascalCase } from 'pascal-case';
-import { caseType, caseTypesArray, changeCase, checkCaseType } from '../utils/casing/';
-import EventEmitter from 'events';
+import {
+    caseType,
+    caseTypesArray,
+    changeCase,
+    checkCaseType,
+} from '../utils/casing/';
 import { Events } from '../events';
-import { registerPlugins } from '../plugins';
-import { supportedPluginNames, SupportedPluginNamesType } from '../plugins/types';
+import { registerBuiltinPlugins } from '../plugins';
+import {
+    supportedPluginNames,
+    SupportedPluginNamesType,
+} from '../plugins/types';
+import { PluginManager } from '../plugins/PluginManager';
 
 export default class InterfaceManager {
     private Interfaces: Record<string, Interface> = {}; // string = strapi name
@@ -26,7 +34,7 @@ export default class InterfaceManager {
     private StrapiSrcRoot: string;
     private Options: typeof InterfaceManager.BaseOptions;
     private PrettierOptions: any;
-    public eventEmitter: EventEmitter = new EventEmitter();
+    private PluginManager: PluginManager;
 
     static BaseOptions = {
         prefix: 'I',
@@ -42,7 +50,11 @@ export default class InterfaceManager {
         enabledPlugins: <SupportedPluginNamesType[]>[],
     };
 
-    constructor(outRoot: string, strapiSrcRoot: string, options: Partial<typeof InterfaceManager['BaseOptions']> = {}) {
+    constructor(
+        outRoot: string,
+        strapiSrcRoot: string,
+        options: Partial<typeof InterfaceManager['BaseOptions']> = {}
+    ) {
         this.OutRoot = outRoot;
         this.StrapiSrcRoot = strapiSrcRoot;
         this.Options = {
@@ -55,29 +67,53 @@ export default class InterfaceManager {
                 this.Options[name] = InterfaceManager.BaseOptions[name];
             }
         });
+        this.PluginManager = new PluginManager();
         this.validateOptions();
-        this.registerPlugins();
+        this.registerBuiltinPlugins();
     }
 
-    registerPlugins() {
-        const pluginNames = new Set<SupportedPluginNamesType>(this.Options.enabledPlugins);
-        registerPlugins(pluginNames, this.eventEmitter);
+    registerBuiltinPlugins() {
+        const pluginNames = new Set<SupportedPluginNamesType>(
+            this.Options.enabledPlugins
+        );
+        registerBuiltinPlugins(this.PluginManager, pluginNames);
+        this.PluginManager.sortHooks();
+    }
+
+    // TODO: this function let's the user register their own plugins
+    registerPlugin() {
+        throw new Error('Not implemented');
     }
 
     validateOptions() {
         if (!checkCaseType(this.Options.fileCaseType)) {
-            throw new Error(`${this.Options.fileCaseType} is not a supported type, please use one of the following ${caseTypesArray.join(', ')}`);
+            throw new Error(
+                `${
+                    this.Options.fileCaseType
+                } is not a supported type, please use one of the following ${caseTypesArray.join(
+                    ', '
+                )}`
+            );
         }
         if (!checkCaseType(this.Options.folderCaseType)) {
-            throw new Error(`${this.Options.folderCaseType} is not a supported type, please use one of the following ${caseTypesArray.join(', ')}`);
+            throw new Error(
+                `${
+                    this.Options.folderCaseType
+                } is not a supported type, please use one of the following ${caseTypesArray.join(
+                    ', '
+                )}`
+            );
         }
 
         this.Options.enabledPlugins.forEach((enabledPlugin) => {
             if (!supportedPluginNames.includes(enabledPlugin)) {
-                throw new Error(`${enabledPlugin} is not a supported plugin, please open an issue on https://github.com/Oak-Digital/types-4-strapi-2 or only use the following plugins [${supportedPluginNames.join(', ')}]`);
+                throw new Error(
+                    `plugin: \`${enabledPlugin}\` is not a supported plugin, please open an issue on https://github.com/Oak-Digital/types-4-strapi-2 if you want this included or only use the following plugins [${supportedPluginNames.join(
+                        ', '
+                    )}]`
+                );
             }
         });
-
     }
 
     async loadPrettierConfig() {
@@ -102,19 +138,22 @@ export default class InterfaceManager {
         const componentSchemasPre = [];
         const apiSchemasPromise = getApiSchemas(this.StrapiSrcRoot);
         const componentSchemasPromise = getComponentSchemas(this.StrapiSrcRoot);
-        this.eventEmitter.emit(Events.BeforeReadSchema, {
+        this.PluginManager.invoke(Events.BeforeReadSchema, this, {
             apiSchemas: apiSchemasPre,
             componentSchemas: componentSchemasPre,
         });
 
-        const [apiSchemas, componentSchemas] = await Promise.all([apiSchemasPromise, componentSchemasPromise]);
+        const [apiSchemas, componentSchemas] = await Promise.all([
+            apiSchemasPromise,
+            componentSchemasPromise,
+        ]);
 
-        const newObject ={
+        const newObject = {
             apiSchemas: [...apiSchemasPre, ...apiSchemas],
             componentSchemas: [...componentSchemasPre, ...componentSchemas],
         };
 
-        this.eventEmitter.emit(Events.AfterReadSchema, newObject);
+        this.PluginManager.invoke(Events.AfterReadSchema, this, newObject);
 
         return newObject;
     }
@@ -148,7 +187,10 @@ export default class InterfaceManager {
                 const prefix = this.Options.componentPrefixOverridesPrefix
                     ? componentPrefix
                     : this.Options.prefix + componentPrefix;
-                const categoryFolderName = changeCase(categoryName, this.Options.folderCaseType);
+                const categoryFolderName = changeCase(
+                    categoryName,
+                    this.Options.folderCaseType
+                );
                 // make component interface
                 const inter = new ComponentInterface(
                     componentName,
@@ -168,10 +210,18 @@ export default class InterfaceManager {
         const outDir = `./${outDirName}`;
         const builtinInterfaces = [];
         builtinInterfaces.push(
-            createMediaInterface(outDir, this.Options.fileCaseType, this.Options.prefix)
+            createMediaInterface(
+                outDir,
+                this.Options.fileCaseType,
+                this.Options.prefix
+            )
         );
         builtinInterfaces.push(
-            createMediaFormatInterface(outDir, this.Options.fileCaseType, this.Options.prefix)
+            createMediaFormatInterface(
+                outDir,
+                this.Options.fileCaseType,
+                this.Options.prefix
+            )
         );
         builtinInterfaces.forEach((inter) => {
             this.Interfaces[inter.getStrapiName()] = inter;
@@ -216,7 +266,10 @@ export default class InterfaceManager {
         const promises = [];
         const componentCategoriesPromises = componentCategories.map(
             async (category) => {
-                const folderName = changeCase(category, this.Options.folderCaseType);
+                const folderName = changeCase(
+                    category,
+                    this.Options.folderCaseType
+                );
                 const path = join(this.OutRoot, folderName);
                 if (existsSync(path)) {
                     return;
@@ -225,7 +278,10 @@ export default class InterfaceManager {
             }
         );
         promises.push(...componentCategoriesPromises);
-        const builintsFolderName = changeCase('builtins', this.Options.folderCaseType);
+        const builintsFolderName = changeCase(
+            'builtins',
+            this.Options.folderCaseType
+        );
         const builtinsPath = join(this.OutRoot, builintsFolderName);
         if (!existsSync(builtinsPath)) {
             promises.push(mkdir(builtinsPath));

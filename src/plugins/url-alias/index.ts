@@ -1,7 +1,11 @@
-import EventEmitter from 'events';
 import { Events, SchemasType } from '../../events';
+import InterfaceManager from '../../program/InterfaceManager';
+import { HooksType } from '../PluginManager';
 
-const addUrlAliasToAllContentTypes = ({ apiSchemas }: SchemasType) => {
+const addUrlAliasToAllContentTypes = (
+    state: InterfaceManager,
+    { apiSchemas }: SchemasType
+) => {
     apiSchemas.forEach((schema) => {
         const { attributes } = schema;
         attributes.url_path = {
@@ -16,8 +20,15 @@ const addUrlAliasToAllContentTypes = ({ apiSchemas }: SchemasType) => {
     });
 };
 
-const register = (eventEmitter: EventEmitter) => {
-    eventEmitter.on(Events.AfterReadSchema, addUrlAliasToAllContentTypes);
+const register = (): Partial<HooksType> => {
+    return {
+        [Events.AfterReadSchema]: [
+            {
+                fn: addUrlAliasToAllContentTypes,
+                priority: 10,
+            },
+        ],
+    };
 };
 
 export default register;
