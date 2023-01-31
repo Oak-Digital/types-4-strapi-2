@@ -1,3 +1,4 @@
+import { POPULATE_GENERIC_NAME } from '../constants';
 import { caseType } from '../utils/casing';
 import Interface from './Interface';
 
@@ -29,6 +30,46 @@ export default class ComponentInterface extends Interface {
 
     updateStrapiName() {
         this.StrapiName = `${this.Category}.${this.getBaseName()}`;
+    }
+
+    // TODO: make this more dynamic in parent
+    override getInerfaceString() {
+        const isPopulatable = this.hasPopulatableAttributes();
+        /* const populateString = isPopulatable ? `<${POPULATE_GENERIC_NAME} extends string | never = never>` : ''; */
+        const strArr = [];
+
+        if (isPopulatable) {
+            strArr.push(`export type ${this.getFullName()}`);
+        } else {
+            strArr.push(`export interface ${this.getFullName()}`);
+        }
+
+        if (isPopulatable) {
+            strArr.push(
+                `<${POPULATE_GENERIC_NAME} extends string | never = never>`
+            );
+            strArr.push(
+                ` = ${this.RelationNames['builtins::RequiredBy'].name}<`
+            );
+        }
+        strArr.push(' {\n');
+        strArr.push(this.getInterfaceFieldsString());
+        strArr.push('}');
+
+        if (isPopulatable) {
+            strArr.push(', ');
+            strArr.push(this.RelationNames['builtins::ExtractFlat'].name);
+            // extract flat start
+            strArr.push('<');
+            strArr.push(POPULATE_GENERIC_NAME);
+            // extract flat end
+            strArr.push('>');
+            // required by end
+            strArr.push('>');
+        }
+
+        const str = strArr.join('');
+        return str;
     }
 
     getInterfaceFieldsString() {
