@@ -49,11 +49,12 @@ This can be done with the `--out` flag like in the following example.
 * Generate TypeScript interfaces for builtin types such as `Media` and `MediaFormat`
 * Select input and output directory
 * Prettier formatting and ability to use your own `.prettierrc`.
+* Generate types for plugins such as [url-alias](https://github.com/strapi-community/strapi-plugin-url-alias)
+* Population by generics
 
 ### Planned features
 
 * Support for localization
-* Support if you are using other plugins, such as `url-alias`, which should add extra fields for some interfaces.
 
 ## Flags
 
@@ -65,6 +66,45 @@ This can be done with the `--out` flag like in the following example.
 | --component-prefix <prefix> | A prefix for components                                                              | none        |
 | -D, --delete-old            | CAUTION: This option is equivalent to running `rm -rf` on the output directory first | `false`     |
 | --prettier <file>           | The prettier config file to use for formatting TypeScript interfaces                 | none        |
+| --plugins <plugins...>      | The plugins to use                                                                   | none        |
+
+## Using plugins
+
+It is possible to generate types for plugins, for example url-alias gives a new field on your content types, so that plugin will automatically add that field to your types.
+You can see a list of builtin plugins below.
+Some plugins might not be fully featured.
+
+It will be possible in the future to add your own plugins in later versions.
+
+### List of supported plugins
+
+* url-alias
+
+### example of using plugins
+
+```bash
+$ t4s --plugins url-alias
+```
+
+## Population
+
+If your content types contains relations, dynamic zones or media, the fields can be set to required in the same way as you would populate them in the strapi api.
+
+Here is an example if you have a content type name page, with a relation to a related page that you want the title and date of.
+
+```typescript
+type PageWithRelated = Page<'related_page.title' | 'related_page.date'>
+```
+
+This will make the title and date field on the new type required, so that you do not need to make an extra if check.
+NOTE: when doing this, you should also make sure that you are actually populating it the same way as in the api
+
+Other example using an array
+
+```typescript
+const populatedFields = ['related_page.title', 'related_page.date'] as const; // as const is important
+type PageWithRelated = Page<typeof populatedFields[number]>;
+```
 
 ## Tips and tricks
 
