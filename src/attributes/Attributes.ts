@@ -125,7 +125,17 @@ export default class Attributes {
                 const relationMultipleString = attr.relation.endsWith('ToMany')
                     ? '[]'
                     : orNull;
-                str += `{ data: ${dependencyName}${relationMultipleString}; }`;
+                str += `{ data: `;
+                str += dependencyName;
+                // TODO: assert correctly
+                const relationInterface = this.RelationNames[apiName].file as Interface;
+                if (relationInterface.hasPopulatableAttributes()) {
+                    str += '<';
+                    str += `${this.RelationNames['builtins::ExtractNested'].name}<${POPULATE_GENERIC_NAME}, '${attrName}'>`;
+                    str += '>';
+                }
+                str += relationMultipleString;
+                str += `; }`;
                 break;
             case 'component':
                 const componentName = attr.component;
@@ -139,7 +149,10 @@ export default class Attributes {
                 const mediaMultipleString = attr.multiple
                     ? '[]'
                     : requiredString;
-                str += `{ data: ${this.RelationNames['builtins::Media'].name}${mediaMultipleString}; }`;
+                str += `{ data: `;
+                str += this.RelationNames['builtins::Media'].name;
+                str += mediaMultipleString;
+                str += `; }`;
                 break;
             case 'password':
                 return null;
