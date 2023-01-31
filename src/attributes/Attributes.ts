@@ -41,6 +41,18 @@ export default class Attributes {
         return false;
     }
 
+    getPopulatableAttributes() {
+        const populatableAttributes = new Set<string>();
+        for (const attrName in this.Attrs) {
+            const attr = this.Attrs[attrName];
+            if (this.isAttributePopulatable(attr)) {
+                populatableAttributes.add(attrName);
+            }
+        }
+
+        return populatableAttributes;
+    }
+
     getDependencies() {
         const dependencies = new Set<string>();
         for (const attrName in this.Attrs) {
@@ -66,8 +78,6 @@ export default class Attributes {
                 case 'dynamiczone':
                     const componentDeps = attr.components ?? [];
                     componentDeps.forEach((dep) => dependencies.add(dep));
-                    // TODO: this could probably be checked against
-                    dependencies.add('builtins::ExtractNested');
                     break;
                 default:
                     continue;
@@ -77,6 +87,13 @@ export default class Attributes {
             //     continue;
             // }
         }
+
+        if (this.hasPopulatableAttributes()) {
+            dependencies.add('builtins::ExtractNested');
+            dependencies.add('builtins::ExtractFlat');
+            dependencies.add('builtins::RequiredBy');
+        }
+
         return Array.from(dependencies);
     }
 
@@ -140,9 +157,8 @@ export default class Attributes {
                         const component = this.RelationNames[componentName];
                         // in this context file should always be an interface
                         const file = component.file as Interface;
-                        const populatable =
-                            file.hasPopulatableAttributes();
-                            /* false; */
+                        const populatable = file.hasPopulatableAttributes();
+                        /* false; */
                         const populatableString = populatable
                             ? `${this.RelationNames[componentName].name}<${this.RelationNames['builtins::ExtractNested'].name}<${POPULATE_GENERIC_NAME}, '${attrName}'>>`
                             : this.RelationNames[componentName].name;
