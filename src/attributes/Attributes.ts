@@ -143,11 +143,18 @@ export default class Attributes {
             case 'component':
                 const componentName = attr.component;
                 const relationNameObj = this.RelationNames[componentName];
+                // TODO: assert correctly
+                const componentInterface = relationNameObj.file as Interface;
                 /* console.log(this.RelationNames); */
                 const dependencyComponentName: string = relationNameObj.name;
                 /* isArray = attr.repeatable ?? false; */
                 isArray = false; // we already handle this here.
                 str += dependencyComponentName;
+                if (componentInterface.hasPopulatableAttributes()) {
+                    str += '<';
+                    str += `${this.RelationNames['builtins::ExtractNested'].name}<${POPULATE_GENERIC_NAME}, '${attrName}'>`;
+                    str += '>';
+                }
                 if (attr.repeatable) {
                     str += '[]';
                 }
