@@ -1,3 +1,4 @@
+import { CERTAINLY_REQUIRED_KEY } from '../constants';
 import { caseType } from '../utils/casing';
 import BuiltinComponentInterface from './BuiltinComponentInterface';
 import BuiltinInterface from './BuiltinInterface';
@@ -9,16 +10,21 @@ export function createMediaInterface(
 ) {
     const stringRequiredFields = [
         'name',
-        'alternativeText',
-        'caption',
         'hash',
         'ext',
         'mime',
         'url',
         'provider',
     ];
-    const stringFields = ['previewUrl', 'provider_metadata'];
-    const numberFields = ['width', 'height', 'size'];
+    const stringFields = [
+        'previewUrl',
+        'provider_metadata',
+        'alternativeText', // nullable in plain text
+        'caption', // nullable in plain text
+    ];
+    const numberRequiredFields = ['size'];
+    // Nullable if you have a plain text file
+    const numberFields = ['width', 'height'];
     const mediaFormat = {
         type: 'component',
         repeatable: false,
@@ -39,13 +45,24 @@ export function createMediaInterface(
     };
 
     stringRequiredFields.forEach((s) => {
-        mediaAttrs[s] = { type: 'string', required: true };
+        mediaAttrs[s] = {
+            type: 'string',
+            required: true,
+            [CERTAINLY_REQUIRED_KEY]: true,
+        };
     });
     stringFields.forEach((s) => {
         mediaAttrs[s] = { type: 'string' };
     });
     numberFields.forEach((s) => {
-        mediaAttrs[s] = { type: 'integer', required: true };
+        mediaAttrs[s] = { type: 'integer' };
+    });
+    numberRequiredFields.forEach((s) => {
+        mediaAttrs[s] = {
+            type: 'integer',
+            required: true,
+            [CERTAINLY_REQUIRED_KEY]: true,
+        };
     });
     // const dataAttrs = {
     //     data: {

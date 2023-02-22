@@ -1,4 +1,4 @@
-import { POPULATE_GENERIC_NAME } from '../constants';
+import { CERTAINLY_REQUIRED_KEY, POPULATE_GENERIC_NAME } from '../constants';
 import { RelationNames } from '../file/File';
 import Interface from '../interface/Interface';
 
@@ -105,7 +105,7 @@ export default class Attributes {
         const orNull = ' | null';
         // TODO: only add this in non paranoid mode
         /* const requiredString = attr.required !== true ? orNull : ''; */
-        const requiredString = orNull;
+        const requiredString = attr?.[CERTAINLY_REQUIRED_KEY] === true ? '' : orNull;
         let str = `    ${attrName}${optionalString}: `;
         let isArray = false;
         switch (attr.type) {
