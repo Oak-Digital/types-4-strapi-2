@@ -145,8 +145,13 @@ export default class Attributes {
                 const relationNameObj = this.RelationNames[componentName];
                 /* console.log(this.RelationNames); */
                 const dependencyComponentName: string = relationNameObj.name;
-                isArray = attr.repeatable ?? false;
+                /* isArray = attr.repeatable ?? false; */
+                isArray = false; // we already handle this here.
                 str += dependencyComponentName;
+                if (attr.repeatable) {
+                    str += '[]';
+                }
+                str += requiredString; // resolves #20. components can be null.
                 break;
             case 'media':
                 const mediaMultipleString = attr.multiple
