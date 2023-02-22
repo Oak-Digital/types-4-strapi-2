@@ -20,6 +20,7 @@ export default class Attributes {
             case 'nested':
                 // we need to check equality since it could be undefined
                 return attr.nullable === true;
+            case 'media': // media is also always populatable
             case 'component':
             case 'dynamiczone':
             case 'relation':
@@ -102,7 +103,9 @@ export default class Attributes {
         const isOptional = isPopulatable;
         const optionalString = isOptional ? '?' : '';
         const orNull = ' | null';
-        const requiredString = attr.required !== true ? orNull : '';
+        // TODO: only add this in non paranoid mode
+        /* const requiredString = attr.required !== true ? orNull : ''; */
+        const requiredString = orNull;
         let str = `    ${attrName}${optionalString}: `;
         let isArray = false;
         switch (attr.type) {
