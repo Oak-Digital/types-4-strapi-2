@@ -157,8 +157,9 @@ export default class Attributes {
                 }
                 if (attr.repeatable) {
                     str += '[]';
+                } else {
+                    str += requiredString; // resolves #20. components can be null.
                 }
-                str += requiredString; // resolves #20. components can be null.
                 break;
             case 'media':
                 const mediaMultipleString = attr.multiple
