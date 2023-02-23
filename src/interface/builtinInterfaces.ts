@@ -87,17 +87,21 @@ export function createMediaFormatInterface(
 ) {
     const stringRequiredFields = ['name', 'hash', 'ext', 'mime', 'url'];
     const stringFields = ['path'];
-    const numberFields = ['width', 'height', 'size'];
+    const numberRequiredFields = ['size', 'width', 'height']; // TODO: not sure if this is corrext
+    const numberFields = [];
     const mediaAttrs = {};
 
     stringRequiredFields.forEach((s) => {
-        mediaAttrs[s] = { type: 'string', required: true };
+        mediaAttrs[s] = { type: 'string', required: true, [CERTAINLY_REQUIRED_KEY]: true };
     });
     stringFields.forEach((s) => {
         mediaAttrs[s] = { type: 'string' };
     });
+    numberRequiredFields.forEach((s) => {
+        mediaAttrs[s] = { type: 'integer', required: true, [CERTAINLY_REQUIRED_KEY]: true };
+    });
     numberFields.forEach((s) => {
-        mediaAttrs[s] = { type: 'integer', required: true };
+        mediaAttrs[s] = { type: 'integer' };
     });
     return new BuiltinComponentInterface(
         'MediaFormat',
