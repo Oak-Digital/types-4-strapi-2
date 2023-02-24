@@ -6,7 +6,7 @@ import { readDirFiltered } from '../utils';
 export async function readSchema(schemaPath: string) {
     try {
         const schemaData = await readFile(schemaPath);
-        return JSON.parse(schemaData.toString()).attributes;
+        return JSON.parse(schemaData.toString());
     } catch (e) {
         return null;
     }
@@ -35,9 +35,9 @@ export async function getComponentSchemas(strapiSrcRoot: string) {
         const schemaFiles = await readDirFiltered(schemaFilesPath);
         const schemaNamesWithAttributesPromises = schemaFiles.map(async (file: string) => {
             const schemaPath = join(schemaFilesPath, file);
-            const attributes = await readSchema(schemaPath);
+            const schema = await readSchema(schemaPath);
             const name = file.split('.')[0];
-            return { name, attributes };
+            return { name, schema };
         });
         const schemaNamesWithAttributes = await Promise.all(schemaNamesWithAttributesPromises);
         return { category, schemas: schemaNamesWithAttributes };
@@ -50,8 +50,8 @@ export async function getApiSchemas(strapiSrcRoot: string) {
     const apiFolders = await getApiFolders(strapiSrcRoot);
     const schemasWithAttributesPromises = apiFolders.map(async (folder: string) => {
         const schemaPath = join(strapiSrcRoot, 'api', folder, 'content-types', folder, 'schema.json');
-        const attributes = await readSchema(schemaPath);
-        return { name: folder, attributes };
+        const schema = await readSchema(schemaPath);
+        return { name: folder, schema };
     });
     const schemasWithAttributes = Promise.all(schemasWithAttributesPromises);
     return schemasWithAttributes;

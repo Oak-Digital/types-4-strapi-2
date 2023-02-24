@@ -179,7 +179,7 @@ export default class InterfaceManager {
         this.PluginManager.invoke(Events.BeforeReadSchemas, this);
 
         apiSchemas.forEach((schema) => {
-            const { name, attributes } = schema;
+            const { name, schema: { attributes } } = schema;
             const strapiName = `api::${name}.${name}`;
             const inter = new Interface(
                 name,
@@ -193,9 +193,9 @@ export default class InterfaceManager {
 
         componentSchemas.forEach((category) => {
             const categoryName: string = category.category;
-            category.schemas.forEach((schema) => {
-                const componentName = schema.name;
-                const strapiName = `${categoryName}.${schema.name}`;
+            category.schemas.forEach(({ name, schema }) => {
+                const componentName = name;
+                const strapiName = `${categoryName}.${name}`;
                 const componentPrefix = `${this.Options.componentPrefix}${
                     this.Options.useCategoryPrefix
                         ? pascalCase(categoryName)

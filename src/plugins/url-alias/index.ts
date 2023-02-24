@@ -8,7 +8,7 @@ const addUrlAliasToAllContentTypes: HookTypes['AfterReadSchema'] = (
     state: InterfaceManager,
     { apiSchemas }: SchemasType
 ) => {
-    apiSchemas.forEach((schema) => {
+    apiSchemas.forEach(({ name, schema }) => {
         const { attributes } = schema;
         attributes.url_path = {
             type: 'string',
@@ -39,8 +39,8 @@ const register: PluginRegister = () => {
             {
                 fn: addUrlAliasGetType,
                 priority: 10,
-            }
-        ]
+            },
+        ],
     };
 };
 
