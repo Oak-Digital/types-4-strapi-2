@@ -1,6 +1,6 @@
 import { existsSync } from 'fs';
 import { mkdir, rm, writeFile } from 'fs/promises';
-import { join } from 'path/posix';
+import { join, dirname } from 'path/posix';
 import {
     createMediaFormatInterface,
     createMediaInterface,
@@ -31,14 +31,13 @@ import { File } from '../file/File';
 import { createExtraTypes } from '../extra-types/createExtraTypes';
 
 export default class InterfaceManager {
-    // TODO: remove Interfaces
-    private Interfaces: Record<string, Interface> = {}; // string = strapi name
     private Files: Record<string, File> = {}; // string = strapi name
     private OutRoot: string;
     private StrapiSrcRoot: string;
     private Options: typeof InterfaceManager.BaseOptions;
     private PrettierOptions: any;
     private PluginManager: PluginManager;
+    private dependenciesInjected: boolean = false;
 
     static BaseOptions = {
         prefix: 'I',
@@ -162,8 +161,22 @@ export default class InterfaceManager {
         return newObject;
     }
 
+    public addType(name: string, file: File, force: boolean = false) {
+        if (this.dependenciesInjected) {
+            console.warn('You should not add types after dependencies have been injected');
+        }
+        if (this.Files[name] && !force) {
+            return false;
+        }
+
+        this.Files[name] = file;
+
+        return true;
+    }
+
     async createInterfaces() {
         const { apiSchemas, componentSchemas } = await this.readSchemas();
+        this.PluginManager.invoke(Events.BeforeReadSchemas, this);
 
         apiSchemas.forEach((schema) => {
             const { name, attributes } = schema;
@@ -175,8 +188,7 @@ export default class InterfaceManager {
                 this.Options.fileCaseType,
                 this.Options.prefix
             );
-            this.Interfaces[strapiName] = inter;
-            this.Files[strapiName] = inter;
+            this.addType(strapiName, inter)
         });
 
         componentSchemas.forEach((category) => {
@@ -205,10 +217,11 @@ export default class InterfaceManager {
                     this.Options.fileCaseType,
                     prefix
                 );
-                this.Interfaces[strapiName] = inter;
-                this.Files[strapiName] = inter;
+                this.addType(strapiName, inter)
             });
         });
+
+        this.PluginManager.invoke(Events.AfterReadSchemas, this);
     }
 
     createBuiltinInterfaces() {
@@ -231,8 +244,7 @@ export default class InterfaceManager {
             )
         );
         builtinInterfaces.forEach((inter) => {
-            this.Interfaces[inter.getStrapiName()] = inter;
-            this.Files[inter.getStrapiName()] = inter;
+            this.addType(inter.getStrapiName(), inter);
         });
 
         // Types
@@ -242,13 +254,14 @@ export default class InterfaceManager {
         );
 
         types.forEach((t) => {
-            this.Files[t.getStrapiName()] = t;
+            this.addType(t.getStrapiName(), t);
         });
     }
 
     // Inject dependencies into all interfaces
     injectDependencies() {
-        // console.log("Injecting dependencies")
+        this.PluginManager.invoke(Events.BeforeInjectDependencies, this)
+
         Object.keys(this.Files).forEach((strapiName: string) => {
             const file = this.Files[strapiName];
             const dependencies = file.getDependencies();
@@ -260,6 +273,9 @@ export default class InterfaceManager {
                 .filter((inter) => inter);
             file.setRelations(interfacesToInject);
         });
+
+        this.dependenciesInjected = true;
+        this.PluginManager.invoke(Events.AfterInjectDependencies, this)
     }
 
     async deleteOldFolders() {
@@ -329,6 +345,9 @@ export default class InterfaceManager {
                     this.OutRoot,
                     file.getRelativeRootPathFile()
                 );
+                await mkdir(dirname(filePath), {
+                    recursive: true,
+                });
                 await writeFile(filePath, formattedFileData);
             }
         );

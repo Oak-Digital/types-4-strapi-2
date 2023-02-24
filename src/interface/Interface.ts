@@ -29,9 +29,14 @@ export default class Interface extends File {
         this.updateStrapiName();
         this.NamePrefix = prefix;
         this.Attributes = attributes;
+
+        if (!attributes) {
+            console.warn(`Warning: attributes for ${this.getStrapiName()} is empty!`)
+        }
     }
 
     protected updateStrapiName() {
+        // TODO: add support for api name
         this.StrapiName = `api::${this.BaseName}.${this.BaseName}`;
     }
 
@@ -44,6 +49,7 @@ export default class Interface extends File {
     }
 
     getFullName() {
+        // TODO: use correct casing from options
         const pascalName = pascalCase(this.BaseName);
         return `${this.NamePrefix}${pascalName}`;
     }

@@ -1,6 +1,10 @@
 export enum Events {
     BeforeReadSchema = 'BeforeReadSchema',
     AfterReadSchema = 'AfterReadSchema',
+    BeforeReadSchemas = 'BeforeReadSchemas',
+    AfterReadSchemas = 'AfterReadSchemas',
+    BeforeInjectDependencies = 'BeforeInjectDependencies',
+    AfterInjectDependencies = 'AfterInjectDependencies',
 }
 
 export type SchemasType = {

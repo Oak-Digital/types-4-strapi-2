@@ -3,11 +3,14 @@ import InterfaceManager from '../program/InterfaceManager';
 
 // TODO: figure out which state is needed for each plugin
 export type HookTypes = {
-    BeforeReadSchema: (state: InterfaceManager, schema: any) => void;
-    AfterReadSchema: (state: InterfaceManager, schema: any) => void;
+    [Events.BeforeReadSchema]: (state: InterfaceManager, schema: any) => void;
+    [Events.AfterReadSchema]: (state: InterfaceManager, schema: any) => void;
 
-    BeforeReadSchemas: (state: InterfaceManager) => void;
-    AfterReadSchemas: (state: InterfaceManager) => void;
+    [Events.BeforeReadSchemas]: (state: InterfaceManager) => void;
+    [Events.AfterReadSchemas]: (state: InterfaceManager) => void;
+
+    [Events.BeforeInjectDependencies]: (state: InterfaceManager) => void;
+    [Events.AfterInjectDependencies]: (state: InterfaceManager) => void;
 };
 
 export type HooksType = {
@@ -19,10 +22,12 @@ export type HooksType = {
 
 export class PluginManager {
     hooks: HooksType = {
-        BeforeReadSchema: [],
-        BeforeReadSchemas: [],
-        AfterReadSchema: [],
-        AfterReadSchemas: [],
+        [Events.BeforeReadSchema]: [],
+        [Events.BeforeReadSchemas]: [],
+        [Events.AfterReadSchema]: [],
+        [Events.AfterReadSchemas]: [],
+        [Events.BeforeInjectDependencies]: [],
+        [Events.AfterInjectDependencies]: [],
     };
 
     registerPlugin(hooks: Partial<HooksType>) {

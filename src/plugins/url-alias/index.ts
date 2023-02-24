@@ -1,8 +1,10 @@
 import { Events, SchemasType } from '../../events';
 import InterfaceManager from '../../program/InterfaceManager';
-import { HooksType } from '../PluginManager';
+import { HooksType, HookTypes } from '../PluginManager';
+import { PluginRegister } from '../types';
+import { UrlAliasGet } from './type';
 
-const addUrlAliasToAllContentTypes = (
+const addUrlAliasToAllContentTypes: HookTypes['AfterReadSchema'] = (
     state: InterfaceManager,
     { apiSchemas }: SchemasType
 ) => {
@@ -20,7 +22,12 @@ const addUrlAliasToAllContentTypes = (
     });
 };
 
-const register = (): Partial<HooksType> => {
+const addUrlAliasGetType = (state: InterfaceManager) => {
+    const urlAliasGet = new UrlAliasGet();
+    state.addType(urlAliasGet.getStrapiName(), urlAliasGet);
+};
+
+const register: PluginRegister = () => {
     return {
         [Events.AfterReadSchema]: [
             {
@@ -28,6 +35,12 @@ const register = (): Partial<HooksType> => {
                 priority: 10,
             },
         ],
+        [Events.AfterReadSchemas]: [
+            {
+                fn: addUrlAliasGetType,
+                priority: 10,
+            }
+        ]
     };
 };
 
