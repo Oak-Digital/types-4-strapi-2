@@ -9,6 +9,8 @@ export type HookTypes = {
     [Events.BeforeReadSchemas]: (state: InterfaceManager) => void;
     [Events.AfterReadSchemas]: (state: InterfaceManager) => void;
 
+    [Events.ModifySchemas]: (state: InterfaceManager) => void;
+
     [Events.BeforeInjectDependencies]: (state: InterfaceManager) => void;
     [Events.AfterInjectDependencies]: (state: InterfaceManager) => void;
 };
@@ -26,6 +28,7 @@ export class PluginManager {
         [Events.BeforeReadSchemas]: [],
         [Events.AfterReadSchema]: [],
         [Events.AfterReadSchemas]: [],
+        [Events.ModifySchemas]: [],
         [Events.BeforeInjectDependencies]: [],
         [Events.AfterInjectDependencies]: [],
     };

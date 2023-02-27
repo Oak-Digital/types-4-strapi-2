@@ -10,6 +10,7 @@ const addUrlAliasToAllContentTypes: HookTypes['AfterReadSchema'] = (
 ) => {
     apiSchemas.forEach(({ name, schema }) => {
         const { attributes } = schema;
+        // TODO: write comment here if it is intentional that it it can be null
         attributes.url_path = {
             type: 'string',
             required: true,

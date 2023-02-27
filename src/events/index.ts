@@ -3,6 +3,7 @@ export enum Events {
     AfterReadSchema = 'AfterReadSchema',
     BeforeReadSchemas = 'BeforeReadSchemas',
     AfterReadSchemas = 'AfterReadSchemas',
+    ModifySchemas = 'ModifySchemas',
     BeforeInjectDependencies = 'BeforeInjectDependencies',
     AfterInjectDependencies = 'AfterInjectDependencies',
 }
