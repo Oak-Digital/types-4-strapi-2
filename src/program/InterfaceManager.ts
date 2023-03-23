@@ -13,7 +13,7 @@ import {
     getComponentSchemas,
 } from '../content-types/reader';
 import prettier from 'prettier';
-import { pascalCase } from 'pascal-case';
+import { pascalCase } from 'change-case';
 import {
     caseType,
     caseTypesArray,
