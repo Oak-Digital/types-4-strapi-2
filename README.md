@@ -154,12 +154,12 @@ export default (plugin: any) => {
 To build this project, use the following command
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 ## Publishing
 
 ```bash
-npm run build
-npm publish
+pnpm run build
+pnpm publish
 ```
