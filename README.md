@@ -160,6 +160,7 @@ pnpm run build
 ## Publishing
 
 ```bash
+pnpm version # major | minor | patch
 pnpm run build
 pnpm publish
 ```
