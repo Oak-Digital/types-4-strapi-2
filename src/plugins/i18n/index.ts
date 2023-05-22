@@ -7,9 +7,10 @@ const addLocaleToLocalizedContentTypes: HookTypes['AfterReadSchema'] = (
     state,
     { apiSchemas }
 ) => {
-    apiSchemas.forEach(({ name, schema }) => {
-        const { attributes } = schema;
-        if (schema?.pluginOptions?.i18n?.localized !== true) {
+
+    Object.entries(apiSchemas).forEach(([strapiName, schema]) => {
+        const { attributes } = schema.contentType;
+        if (schema.contentType?.pluginOptions?.i18n?.localized !== true) {
             return;
         }
         // Add locale to all localized content types
@@ -22,7 +23,7 @@ const addLocaleToLocalizedContentTypes: HookTypes['AfterReadSchema'] = (
         attributes.localizations = {
             type: 'relation',
             relation: 'oneToMany',
-            target: `api::${name}.${name}`, // TODO: make this more complete
+            target: strapiName
         };
     });
 };

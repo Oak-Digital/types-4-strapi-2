@@ -171,10 +171,10 @@ export default class InterfaceManager {
         const apiSchemasPromise = this.contentTypeReader.readContentTypes();
         const componentSchemasPromise = this.contentTypeReader.readComponents();
 
-        /* this.PluginManager.invoke(Events.BeforeReadSchema, this, { */
-        /*     apiSchemas: apiSchemasPre, */
-        /*     componentSchemas: componentSchemasPre, */
-        /* }); */
+        this.PluginManager.invoke(Events.BeforeReadSchema, this, {
+            apiSchemas: apiSchemasPre,
+            componentSchemas: componentSchemasPre,
+        });
 
         const [apiSchemas, componentSchemas] = await Promise.all([
             apiSchemasPromise,
@@ -189,7 +189,7 @@ export default class InterfaceManager {
             componentSchemas: { ...componentSchemasPre, ...componentSchemas },
         };
 
-        /* this.PluginManager.invoke(Events.AfterReadSchema, this, newObject); */
+        this.PluginManager.invoke(Events.AfterReadSchema, this, newObject);
 
         return newObject;
     }
@@ -211,7 +211,7 @@ export default class InterfaceManager {
 
     async createInterfaces() {
         const { apiSchemas, componentSchemas } = await this.readSchemas();
-        /* this.PluginManager.invoke(Events.BeforeReadSchemas, this); */
+        this.PluginManager.invoke(Events.BeforeReadSchemas, this);
 
         Object.entries(apiSchemas).forEach(([name, schema]) => {
             let strapiName = name;
@@ -260,7 +260,7 @@ export default class InterfaceManager {
             this.addType(strapiName, inter);
         });
 
-        /* this.PluginManager.invoke(Events.AfterReadSchemas, this); */
+        this.PluginManager.invoke(Events.AfterReadSchemas, this);
     }
 
     createBuiltinInterfaces() {

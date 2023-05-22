@@ -8,8 +8,10 @@ const addFieldsToContentTypes: HookTypes['AfterReadSchema'] = (
     schema
 ) => {
     const { apiSchemas } = schema;
-    apiSchemas.forEach(({ name, schema }) => {
-        const { attributes, options = {} } = schema;
+
+    Object.entries(apiSchemas).forEach(([strapiName, schema]) => {
+
+        const { attributes, options = {} } = schema.contentType;
         if (options?.draftAndPublish !== true) {
             return;
         }

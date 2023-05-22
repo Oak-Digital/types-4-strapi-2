@@ -1,4 +1,4 @@
-import { Events, SchemasType } from '../../events';
+import { Events } from '../../events';
 import InterfaceManager from '../../program/InterfaceManager';
 import { HooksType, HookTypes } from '../PluginManager';
 import { PluginRegister } from '../types';
@@ -6,10 +6,10 @@ import { UrlAliasGet } from './type';
 
 const addUrlAliasToAllContentTypes: HookTypes['AfterReadSchema'] = (
     state: InterfaceManager,
-    { apiSchemas }: SchemasType
+    { apiSchemas }
 ) => {
-    apiSchemas.forEach(({ name, schema }) => {
-        const { attributes } = schema;
+    Object.entries(apiSchemas).forEach(([strapiName, schema]) => {
+        const { attributes } = schema.contentType;
         // TODO: write comment here if it is intentional that it it can be null
         attributes.url_path = {
             type: 'string',

@@ -1,10 +1,21 @@
 import { Events } from '../events';
 import InterfaceManager from '../program/InterfaceManager';
+import { ContentTypeReader } from '../readers/types/content-type-reader';
 
+type Schemas = {
+    apiSchemas: Awaited<ReturnType<ContentTypeReader['readContentTypes']>>;
+    componentSchemas: Awaited<ReturnType<ContentTypeReader['readComponents']>>;
+};
 // TODO: figure out which state is needed for each plugin
 export type HookTypes = {
-    [Events.BeforeReadSchema]: (state: InterfaceManager, schema: any) => void;
-    [Events.AfterReadSchema]: (state: InterfaceManager, schema: any) => void;
+    [Events.BeforeReadSchema]: (
+        state: InterfaceManager,
+        schema: Schemas
+    ) => void;
+    [Events.AfterReadSchema]: (
+        state: InterfaceManager,
+        schema: Schemas
+    ) => void;
 
     [Events.BeforeReadSchemas]: (state: InterfaceManager) => void;
     [Events.AfterReadSchemas]: (state: InterfaceManager) => void;
