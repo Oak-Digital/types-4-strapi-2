@@ -61,9 +61,21 @@ export default class Interface extends File {
     }
 
     getFullName() {
+        let name;
+        if (this.Namespace === 'admin') {
+            name = `Admin${this.BaseName}`;
+        } else if (this.CollectionName === null) {
+            name = this.BaseName;
+        } else if (this.CollectionName === this.BaseName) {
+            name = this.BaseName;
+        } else {
+            name = this.StrapiName.split('::').pop();
+        }
+
         // TODO: use correct casing from options
-        const pascalName = pascalCase(this.BaseName);
-        return `${this.NamePrefix}${pascalName}`;
+        const pascalName = pascalCase(name);
+        const fullName = `${this.NamePrefix}${pascalName}`;
+        return fullName;
     }
 
     hasPopulatableAttributes() {

@@ -7,7 +7,7 @@ export const strapiContentType = z.object({
     options: z.object({
         draftAndPublish: z.boolean().optional().default(false),
     }),
-    uid: z.string(),
+    uid: z.string().optional(),
 });
 
 export type StrapiContentType = z.infer<typeof strapiContentType>;

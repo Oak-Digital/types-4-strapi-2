@@ -222,7 +222,7 @@ export default class InterfaceManager {
             }
             const attributes = schema.contentType.attributes;
             const inter = new Interface(
-                name,
+                schema.name,
                 schema.namespace,
                 attributes,
                 './',

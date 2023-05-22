@@ -45,8 +45,17 @@ export class ByFileContentTypeReader implements ContentTypeReader {
         > = {};
         const schemasWithAttributesPromises = apiFolders.map(
             async (apiFolder: string) => {
+                const contentTypesFolder = join(
+                    this.strapiSrcRoot,
+                    'api',
+                    apiFolder,
+                    'content-types'
+                );
+                if (!existsSync(contentTypesFolder)) {
+                    return;
+                }
                 const contentTypesFolders = await readDirFiltered(
-                    join(this.strapiSrcRoot, 'api', apiFolder, 'content-types')
+                    contentTypesFolder
                 );
                 const contentTypePromises = contentTypesFolders.map(
                     async (contentTypeFolder: string) => {
@@ -93,6 +102,7 @@ export class ByFileContentTypeReader implements ContentTypeReader {
         const schemaData = await readFile(schemaPath);
         try {
             const object = JSON.parse(schemaData.toString());
+            console.log(object);
             const schema = strapiContentType.parse(object);
             return schema;
         } catch (e) {

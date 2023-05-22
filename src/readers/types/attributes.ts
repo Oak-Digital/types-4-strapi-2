@@ -21,7 +21,7 @@ export type EmailAttribute = z.infer<typeof emailAttribute>;
 
 export const uidAttribute = baseAttribute.extend({
     type: z.literal('uid'),
-    targetField: z.string(),
+    targetField: z.string().optional(),
 });
 
 export type UidAttribute = z.infer<typeof uidAttribute>;
