@@ -217,6 +217,7 @@ export default class Attributes {
                 // console.log(relationsString);
                 str += `Array<${relationsString}>`;
                 break;
+            case 'string':
             case 'text':
             case 'richtext':
             case 'email':

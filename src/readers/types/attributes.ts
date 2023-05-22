@@ -8,7 +8,7 @@ export const baseAttribute = z.object({
 });
 
 export const textAttribute = baseAttribute.extend({
-    type: z.literal('text'),
+    type: z.enum(['text', 'string'])
 });
 
 export type TextAttribute = z.infer<typeof textAttribute>;
