@@ -9,10 +9,6 @@ export default class BuiltinInterface extends Interface {
         fileCase: caseType,
         prefix = ''
     ) {
-        super(baseName, attributes, relativeDirectoryPath, fileCase, prefix);
-    }
-
-    override updateStrapiName() {
-        this.StrapiName = `builtins::${this.BaseName}`;
+        super(baseName, 'builtins', attributes, relativeDirectoryPath, null, fileCase, prefix);
     }
 }

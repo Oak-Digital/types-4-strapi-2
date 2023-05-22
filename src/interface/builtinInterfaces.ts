@@ -1,7 +1,18 @@
+import { z } from 'zod';
 import { CERTAINLY_REQUIRED_KEY } from '../constants';
+import { attribute, contentTypeAttribute } from '../readers/types/attributes';
 import { caseType } from '../utils/casing';
 import BuiltinComponentInterface from './BuiltinComponentInterface';
 import BuiltinInterface from './BuiltinInterface';
+
+export const nestedAttribute = z.object({
+    type: z.literal('nested'),
+    nullable: z.boolean().optional(),
+    fields: z.record(contentTypeAttribute),
+});
+
+export const attributeWithNested = z.union([contentTypeAttribute, nestedAttribute]);
+export type AttributeWithNested = z.infer<typeof attributeWithNested>;
 
 export function createMediaInterface(
     directory: string,
@@ -29,8 +40,8 @@ export function createMediaInterface(
         type: 'component',
         repeatable: false,
         component: 'builtins::MediaFormat',
-    };
-    const mediaAttrs = {
+    } as const;
+    const mediaAttrs: Record<string, AttributeWithNested> = {
         formats: {
             // types-4-strapi-2 specific
             type: 'nested',
@@ -46,13 +57,13 @@ export function createMediaInterface(
 
     stringRequiredFields.forEach((s) => {
         mediaAttrs[s] = {
-            type: 'string',
+            type: 'text',
             required: true,
             [CERTAINLY_REQUIRED_KEY]: true,
         };
     });
     stringFields.forEach((s) => {
-        mediaAttrs[s] = { type: 'string' };
+        mediaAttrs[s] = { type: 'text' };
     });
     numberFields.forEach((s) => {
         mediaAttrs[s] = { type: 'integer' };

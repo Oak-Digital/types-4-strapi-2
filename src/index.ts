@@ -1,5 +1,8 @@
 import { program } from 'commander';
 import InterfaceManager from './program/InterfaceManager';
+import { ByFileContentTypeReader } from './readers/by-file';
+import { BasicWriter } from './writers/basic-writer';
+import prettier from 'prettier';
 
 program.name('t4s');
 
@@ -49,15 +52,34 @@ const {
     plugins,
 } = options;
 
-const manager = new InterfaceManager(out, input, {
-    componentPrefix,
-    prefix,
-    prettierFile,
-    deleteOld,
-    fileCaseType,
-    folderCaseType,
-    enabledPlugins: plugins,
-});
-manager.run().catch((err) => {
-    console.error(err);
-});
+(async () => {
+    const defaultPrettierOptions = {
+        parser: 'typescript',
+    };
+    let prettierOptions: prettier.Options = defaultPrettierOptions;
+    if (prettierFile) {
+        const resolved = await prettier.resolveConfig(prettierFile, {
+            editorconfig: true,
+        });
+        prettierOptions = {
+            ...defaultPrettierOptions,
+            ...resolved,
+        };
+    }
+
+    const reader = new ByFileContentTypeReader(input);
+    const writer = new BasicWriter(out, {
+        deleteOld,
+    });
+
+    const manager = new InterfaceManager(reader, writer, {
+        componentPrefix,
+        prefix,
+        fileCaseType,
+        folderCaseType,
+        enabledPlugins: plugins,
+    });
+    manager.run().catch((err) => {
+        console.error(err);
+    });
+})();

@@ -18,7 +18,17 @@ export default class ComponentInterface extends Interface {
         prefix = '',
         options: Record<string, any> = {}
     ) {
-        super(baseName, attributes, relativeDirectoryPath, fileCase, prefix);
+        // TODO: Component interface doesn't really make sense to extend from Interface, but it works for now.
+        //       we should transition to use composition instead of this type of inheritance
+        super(
+            baseName,
+            'api',
+            attributes,
+            relativeDirectoryPath,
+            category,
+            fileCase,
+            prefix
+        );
         this.Category = category;
         // this.Attributes.id = {
         //     type: "number", // Components have a id field with a number

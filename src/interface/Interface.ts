@@ -13,19 +13,27 @@ import {
 } from 'change-case';
 import { POPULATE_GENERIC_NAME } from '../constants';
 import { File } from '../file/File';
+import { AttributeWithNested } from './builtinInterfaces';
+import { Namespace } from '../readers/types/content-type-reader';
 
 export default class Interface extends File {
     private NamePrefix = '';
-    protected Attributes: any;
+    protected Attributes: Record<string, AttributeWithNested>;
+    protected CollectionName: string | null;
+    protected Namespace: Namespace;
 
     constructor(
         baseName: string,
-        attributes: any,
+        namespace: Namespace,
+        attributes: Record<string, AttributeWithNested>,
         relativeDirectoryPath: string,
+        collectionName: string | null = null,
         fileCaseType: caseType = 'pascal',
         prefix = ''
     ) {
         super(baseName, relativeDirectoryPath, fileCaseType);
+        this.CollectionName = collectionName;
+        this.Namespace = namespace;
         this.updateStrapiName();
         this.NamePrefix = prefix;
         this.Attributes = attributes;
@@ -38,8 +46,10 @@ export default class Interface extends File {
     }
 
     protected updateStrapiName() {
-        // TODO: add support for api name
-        this.StrapiName = `api::${this.BaseName}.${this.BaseName}`;
+        const collectionString = this.CollectionName
+            ? `${this.CollectionName}.`
+            : '';
+        this.StrapiName = `${this.Namespace}::${collectionString}${this.BaseName}`;
     }
 
     getStrapiName() {
