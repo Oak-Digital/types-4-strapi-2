@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "generated_types",
+  "info": {
+    "singularName": "generated-type",
+    "pluralName": "generated-types",
+    "displayName": "Generated type"
+  },
+  "options": {
+    "draftAndPublish": false,
+    "comment": ""
+  },
+  "attributes": {
+    "text": {
+      "type": "string"
+    }
+  }
+}
