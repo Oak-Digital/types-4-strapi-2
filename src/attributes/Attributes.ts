@@ -70,6 +70,9 @@ export default class Attributes {
                     deps.forEach((dep) => dependencies.add(dep));
                     break;
                 case 'relation':
+                    if (attr.relation === 'morphToMany') {
+                        break;
+                    }
                     dependencies.add(attr.target);
                     break;
                 case 'component':
@@ -124,6 +127,10 @@ export default class Attributes {
                 str += newAttrs.toString() + nullableString;
                 break;
             case 'relation':
+                if (attr.relation === 'morphToMany') {
+                    str += 'any';
+                    break;
+                }
                 const apiName = attr.target;
                 // console.log(this.RelationNames, apiName)
                 const dependencyName =

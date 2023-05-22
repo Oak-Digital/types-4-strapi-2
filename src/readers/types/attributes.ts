@@ -139,11 +139,17 @@ export const manyToOneAttribute = baseRelationAttribute.extend({
 
 export const manyToManyAttribute = baseRelationAttribute.extend({
     relation: z.literal('manyToMany'),
-    inversedBy: z.string(),
+    inversedBy: z.string().optional(),
+    mappedBy: z.string().optional(),
 });
 
 export const hasManyAttribute = baseRelationAttribute.extend({
     relation: z.literal('oneToMany'),
+});
+
+export const morphToManyAttribute = z.object({
+    type: z.literal('relation'),
+    relation: z.literal('morphToMany'),
 });
 
 export const relationAttribute = z.union([
@@ -153,6 +159,7 @@ export const relationAttribute = z.union([
     manyToOneAttribute,
     manyToManyAttribute,
     hasManyAttribute,
+    morphToManyAttribute,
 ]);
 
 export type RelationAttribute = z.infer<typeof relationAttribute>;

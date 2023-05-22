@@ -1,4 +1,5 @@
 import { POPULATE_GENERIC_NAME } from '../constants';
+import { Namespace } from '../readers/types/content-type-reader';
 import { caseType } from '../utils/casing';
 import Interface from './Interface';
 
@@ -11,6 +12,7 @@ export default class ComponentInterface extends Interface {
 
     constructor(
         baseName: string,
+        namespace: Namespace,
         attributes: any,
         relativeDirectoryPath: string,
         category: string,
@@ -22,7 +24,7 @@ export default class ComponentInterface extends Interface {
         //       we should transition to use composition instead of this type of inheritance
         super(
             baseName,
-            'api',
+            namespace,
             attributes,
             relativeDirectoryPath,
             category,

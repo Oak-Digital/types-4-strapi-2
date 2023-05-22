@@ -31,7 +31,7 @@ export default class Interface extends File {
         fileCaseType: caseType = 'pascal',
         prefix = ''
     ) {
-        super(baseName, relativeDirectoryPath, fileCaseType);
+        super(baseName, join(namespace, relativeDirectoryPath), fileCaseType);
         this.CollectionName = collectionName;
         this.Namespace = namespace;
         this.updateStrapiName();

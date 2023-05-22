@@ -250,6 +250,7 @@ export default class InterfaceManager {
             // make component interface
             const inter = new ComponentInterface(
                 componentName,
+                'api',
                 schema.attributes,
                 `./${categoryFolderName}`,
                 categoryName,
@@ -264,19 +265,17 @@ export default class InterfaceManager {
 
     createBuiltinInterfaces() {
         // Interfaces
-        const outDirName = changeCase('builtins', this.Options.folderCaseType);
-        const outDir = `./${outDirName}`;
+        /* const outDirName = changeCase('builtins', this.Options.folderCaseType); */
+        /* const outDir = `./${outDirName}`; */
         const builtinInterfaces = [];
         builtinInterfaces.push(
             createMediaInterface(
-                outDir,
                 this.Options.fileCaseType,
                 this.Options.prefix
             )
         );
         builtinInterfaces.push(
             createMediaFormatInterface(
-                outDir,
                 this.Options.fileCaseType,
                 this.Options.prefix
             )

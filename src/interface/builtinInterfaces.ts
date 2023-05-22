@@ -15,7 +15,6 @@ export const attributeWithNested = z.union([contentTypeAttribute, nestedAttribut
 export type AttributeWithNested = z.infer<typeof attributeWithNested>;
 
 export function createMediaInterface(
-    directory: string,
     caseTypeName: caseType,
     prefix: string
 ) {
@@ -85,14 +84,13 @@ export function createMediaInterface(
     return new BuiltinInterface(
         'Media',
         mediaAttrs,
-        directory,
+        '',
         caseTypeName,
         prefix
     );
 }
 
 export function createMediaFormatInterface(
-    directory: string,
     caseTypeName: caseType,
     prefix: string
 ) {
@@ -125,7 +123,7 @@ export function createMediaFormatInterface(
     return new BuiltinComponentInterface(
         'MediaFormat',
         mediaAttrs,
-        directory,
+        '',
         caseTypeName,
         prefix
     );

@@ -6,7 +6,7 @@ export const strapiContentType = z.object({
     collectionName: z.string(),
     options: z.object({
         draftAndPublish: z.boolean().optional().default(false),
-    }),
+    }).optional(),
     uid: z.string().optional(),
 });
 

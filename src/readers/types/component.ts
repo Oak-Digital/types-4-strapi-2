@@ -4,7 +4,7 @@ import { attribute } from './attributes';
 export const strapiComponent = z.object({
     collectionName: z.string(),
     attributes: z.record(attribute),
-    options: z.object({}),
+    options: z.object({}).optional(),
     uid: z.string().optional(),
 });
 

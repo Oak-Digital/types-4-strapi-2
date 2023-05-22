@@ -3,11 +3,12 @@ import InterfaceManager from './program/InterfaceManager';
 import { ByFileContentTypeReader } from './readers/by-file';
 import { BasicWriter } from './writers/basic-writer';
 import prettier from 'prettier';
+import { LoadStrapiReader } from './readers/load-strapi';
 
 program.name('t4s');
 
 program
-    .option('-i, --in <dir>', 'The src directory for strapi', './src')
+    .option('-i, --in <dir>', 'The root directory for strapi', './')
     .option(
         '-o, --out <dir>',
         'The output directory to output the types to',
@@ -67,7 +68,8 @@ const {
         };
     }
 
-    const reader = new ByFileContentTypeReader(input);
+    /* const reader = new ByFileContentTypeReader(input); */
+    const reader = new LoadStrapiReader(input);
     const writer = new BasicWriter(out, {
         deleteOld,
         prettierOptions,
