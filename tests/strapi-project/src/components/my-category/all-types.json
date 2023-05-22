@@ -1,0 +1,88 @@
+{
+  "collectionName": "components_my_category_all_types",
+  "info": {
+    "displayName": "All types",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "rich": {
+      "type": "richtext"
+    },
+    "pswd": {
+      "type": "password"
+    },
+    "int": {
+      "type": "integer"
+    },
+    "bigint": {
+      "type": "biginteger"
+    },
+    "decimal": {
+      "type": "decimal"
+    },
+    "float": {
+      "type": "float"
+    },
+    "enum": {
+      "type": "enumeration",
+      "enum": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    "date": {
+      "type": "date"
+    },
+    "datetime": {
+      "type": "datetime"
+    },
+    "time": {
+      "type": "time"
+    },
+    "multipleMedia": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "singleImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "bool": {
+      "type": "boolean",
+      "required": true
+    },
+    "json": {
+      "type": "json"
+    },
+    "repeatable": {
+      "displayName": "subComponent",
+      "type": "component",
+      "repeatable": true,
+      "component": "other-category.sub-component"
+    },
+    "component": {
+      "type": "component",
+      "repeatable": false,
+      "component": "other-category.sub-component"
+    }
+  }
+}
