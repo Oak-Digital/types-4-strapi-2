@@ -70,6 +70,7 @@ const {
     const reader = new ByFileContentTypeReader(input);
     const writer = new BasicWriter(out, {
         deleteOld,
+        prettierOptions,
     });
 
     const manager = new InterfaceManager(reader, writer, {
