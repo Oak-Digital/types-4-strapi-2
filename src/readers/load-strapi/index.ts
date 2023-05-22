@@ -90,14 +90,20 @@ export class LoadStrapiReader implements ContentTypeReader {
                 reject(err);
             });
         });
+        let jsonParsed: unknown;
+        try {
+            jsonParsed = JSON.parse(output);
+        } catch (err) {
+            console.error(err, output.slice(0, 100));
+            throw new Error('Failed to parse output from remote strapi');
+        }
+
         let parsed: z.infer<typeof schema>;
         try {
-            const jsonParsed = JSON.parse(output);
             parsed = schema.parse(jsonParsed);
-            parsed = jsonParsed;
         } catch (err) {
             console.error(err);
-            throw new Error('Failed to parse output from remote strapi');
+            throw new Error('Failed to parse output from remote strapi, something may be malformed');
         }
 
         // Remove the remote execution file after we're done

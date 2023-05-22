@@ -47,26 +47,34 @@ This can be done with the `--out` flag like in the following example.
 
 * Generate TypeScript interfaces for all your api content-types and components
 * Generate TypeScript interfaces for builtin types such as `Media` and `MediaFormat`
+* Generate TypeScript interfaces for plugins' content types
 * Select input and output directory
 * Prettier formatting and ability to use your own `.prettierrc`.
 * Generate types for plugins such as [url-alias](https://github.com/strapi-community/strapi-plugin-url-alias)
 * Population by generics
 
-### Planned features
-
-* Support for localization
-
 ## Flags
 
 | **Flag**                    | **Description**                                                                      | **Default** |
 |-----------------------------|--------------------------------------------------------------------------------------|-------------|
-| -i, --in <dir>              | The src directory for strapi                                                         | `./src`     |
+| -i, --in <dir>              | The root directory for strapi                                                        | `./`     |
 | -o, --out <dir>             | The output directory to output the types to                                          | `./types`   |
+| -r, --reader <reader>       | The reader to use, see reader section                                                | `by-file`   |
 | --prefix <prefix>           | A prefix for all generated interfaces                                                | `I`         |
 | --component-prefix <prefix> | A prefix for components                                                              | none        |
 | -D, --delete-old            | CAUTION: This option is equivalent to running `rm -rf` on the output directory first | `false`     |
 | --prettier <file>           | The prettier config file to use for formatting TypeScript interfaces                 | none        |
 | --plugins <plugins...>      | The plugins to use                                                                   | none        |
+
+## Readers
+
+To fetch the content types from strapi, we need to read it in some way.
+In version 0.x.x it was done by simply reading the generated files.
+In version 1.x.x the default will be to read the generated files with the `by-file` reader.
+
+You can select which reader you want to use in the cli with the `--reader` flag.
+The `by-file` reader is very fast, but it will not work in some cases and may not provide all the desired types.
+The `load-strapi` reader is slow, but gets all types, it works by creating a strapi instance that would then have loaded all the content types, which can then be etracted.
 
 ## Using plugins
 

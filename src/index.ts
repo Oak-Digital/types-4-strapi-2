@@ -14,6 +14,7 @@ program
         'The output directory to output the types to',
         './types'
     )
+    .option('-r, --reader <reader>', 'The reader to use (possible: by-file, load-strapi. See docs for more info)', 'by-file')
     .option('--prefix <prefix>', 'A prefix for all generated interfaces', 'I')
     .option('--component-prefix <prefix>', 'A prefix for components', '')
     .option(

@@ -3,9 +3,14 @@
 const Strapi = require('@strapi/strapi');
 
 (async () => {
-    const instance = await Strapi({
+    const base = await Strapi({
         distDir: 'dist',
-    }).load();
+    });
+    // Do not remove log.error since it writes to stderr
+    base.log.warn = () => {};
+    base.log.info = () => {};
+
+    const instance = await base.load();
 
     await instance.server.mount();
 
@@ -19,5 +24,6 @@ const Strapi = require('@strapi/strapi');
     // close the connection to the database before deletion
     await instance.db.connection.destroy();
 
+    // Force exit, because else it hangs
     process.exit(0);
 })();
