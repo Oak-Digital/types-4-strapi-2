@@ -9,6 +9,7 @@
     "build": "rimraf lib && tsc -p .",
     "testtypes": "node ./bin/index.js",
     "lint": "eslint src/",
+    "prettier": "prettier --write \"src/**/*.ts\"",
     "t4s": "node ./bin/index.js"
   },
   "repository": {

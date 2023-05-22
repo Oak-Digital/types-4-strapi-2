@@ -92,13 +92,21 @@ export function createMediaFormatInterface(
     const mediaAttrs = {};
 
     stringRequiredFields.forEach((s) => {
-        mediaAttrs[s] = { type: 'string', required: true, [CERTAINLY_REQUIRED_KEY]: true };
+        mediaAttrs[s] = {
+            type: 'string',
+            required: true,
+            [CERTAINLY_REQUIRED_KEY]: true,
+        };
     });
     stringFields.forEach((s) => {
         mediaAttrs[s] = { type: 'string' };
     });
     numberRequiredFields.forEach((s) => {
-        mediaAttrs[s] = { type: 'integer', required: true, [CERTAINLY_REQUIRED_KEY]: true };
+        mediaAttrs[s] = {
+            type: 'integer',
+            required: true,
+            [CERTAINLY_REQUIRED_KEY]: true,
+        };
     });
     numberFields.forEach((s) => {
         mediaAttrs[s] = { type: 'integer' };

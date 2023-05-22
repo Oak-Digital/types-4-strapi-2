@@ -1,10 +1,12 @@
-import { CERTAINLY_REQUIRED_KEY } from "../../constants";
-import { Events } from "../../events";
-import { HookTypes } from "../PluginManager";
-import { PluginRegister } from "../types";
+import { CERTAINLY_REQUIRED_KEY } from '../../constants';
+import { Events } from '../../events';
+import { HookTypes } from '../PluginManager';
+import { PluginRegister } from '../types';
 
-
-const addLocaleToLocalizedContentTypes: HookTypes['AfterReadSchema'] = (state, { apiSchemas }) => {
+const addLocaleToLocalizedContentTypes: HookTypes['AfterReadSchema'] = (
+    state,
+    { apiSchemas }
+) => {
     apiSchemas.forEach(({ name, schema }) => {
         const { attributes } = schema;
         if (schema?.pluginOptions?.i18n?.localized !== true) {
@@ -34,6 +36,6 @@ const register: PluginRegister = () => {
             },
         ],
     };
-}
+};
 
 export default register;

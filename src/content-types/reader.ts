@@ -33,13 +33,17 @@ export async function getComponentSchemas(strapiSrcRoot: string) {
     const nestedSchemasPromises = categories.map(async (category: string) => {
         const schemaFilesPath = join(strapiSrcRoot, 'components', category);
         const schemaFiles = await readDirFiltered(schemaFilesPath);
-        const schemaNamesWithAttributesPromises = schemaFiles.map(async (file: string) => {
-            const schemaPath = join(schemaFilesPath, file);
-            const schema = await readSchema(schemaPath);
-            const name = file.split('.')[0];
-            return { name, schema };
-        });
-        const schemaNamesWithAttributes = await Promise.all(schemaNamesWithAttributesPromises);
+        const schemaNamesWithAttributesPromises = schemaFiles.map(
+            async (file: string) => {
+                const schemaPath = join(schemaFilesPath, file);
+                const schema = await readSchema(schemaPath);
+                const name = file.split('.')[0];
+                return { name, schema };
+            }
+        );
+        const schemaNamesWithAttributes = await Promise.all(
+            schemaNamesWithAttributesPromises
+        );
         return { category, schemas: schemaNamesWithAttributes };
     });
     const nestedSchemasArr = await Promise.all(nestedSchemasPromises);
@@ -48,11 +52,20 @@ export async function getComponentSchemas(strapiSrcRoot: string) {
 
 export async function getApiSchemas(strapiSrcRoot: string) {
     const apiFolders = await getApiFolders(strapiSrcRoot);
-    const schemasWithAttributesPromises = apiFolders.map(async (folder: string) => {
-        const schemaPath = join(strapiSrcRoot, 'api', folder, 'content-types', folder, 'schema.json');
-        const schema = await readSchema(schemaPath);
-        return { name: folder, schema };
-    });
+    const schemasWithAttributesPromises = apiFolders.map(
+        async (folder: string) => {
+            const schemaPath = join(
+                strapiSrcRoot,
+                'api',
+                folder,
+                'content-types',
+                folder,
+                'schema.json'
+            );
+            const schema = await readSchema(schemaPath);
+            return { name: folder, schema };
+        }
+    );
     const schemasWithAttributes = Promise.all(schemasWithAttributesPromises);
     return schemasWithAttributes;
 }

@@ -6,5 +6,5 @@ export async function readDirFiltered(dir: string) {
 }
 
 export function prefixDotSlash(path) {
-    return (/^\.?\.\//).test(path) ? path : './' + path;
+    return /^\.?\.\//.test(path) ? path : './' + path;
 }

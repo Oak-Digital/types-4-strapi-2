@@ -163,7 +163,9 @@ export default class InterfaceManager {
 
     public addType(name: string, file: File, force: boolean = false) {
         if (this.dependenciesInjected) {
-            console.warn('You should not add types after dependencies have been injected');
+            console.warn(
+                'You should not add types after dependencies have been injected'
+            );
         }
         if (this.Files[name] && !force) {
             return false;
@@ -179,7 +181,10 @@ export default class InterfaceManager {
         this.PluginManager.invoke(Events.BeforeReadSchemas, this);
 
         apiSchemas.forEach((schema) => {
-            const { name, schema: { attributes } } = schema;
+            const {
+                name,
+                schema: { attributes },
+            } = schema;
             const strapiName = `api::${name}.${name}`;
             const inter = new Interface(
                 name,
@@ -188,7 +193,7 @@ export default class InterfaceManager {
                 this.Options.fileCaseType,
                 this.Options.prefix
             );
-            this.addType(strapiName, inter)
+            this.addType(strapiName, inter);
         });
 
         componentSchemas.forEach((category) => {
@@ -217,7 +222,7 @@ export default class InterfaceManager {
                     this.Options.fileCaseType,
                     prefix
                 );
-                this.addType(strapiName, inter)
+                this.addType(strapiName, inter);
             });
         });
 
@@ -249,9 +254,7 @@ export default class InterfaceManager {
 
         // Types
         const types = [];
-        types.push(
-            ...createExtraTypes()
-        );
+        types.push(...createExtraTypes());
 
         types.forEach((t) => {
             this.addType(t.getStrapiName(), t);
@@ -260,7 +263,7 @@ export default class InterfaceManager {
 
     // Inject dependencies into all interfaces
     injectDependencies() {
-        this.PluginManager.invoke(Events.BeforeInjectDependencies, this)
+        this.PluginManager.invoke(Events.BeforeInjectDependencies, this);
 
         Object.keys(this.Files).forEach((strapiName: string) => {
             const file = this.Files[strapiName];
@@ -275,7 +278,7 @@ export default class InterfaceManager {
         });
 
         this.dependenciesInjected = true;
-        this.PluginManager.invoke(Events.AfterInjectDependencies, this)
+        this.PluginManager.invoke(Events.AfterInjectDependencies, this);
     }
 
     async deleteOldFolders() {
@@ -355,12 +358,10 @@ export default class InterfaceManager {
     }
 
     async writeIndexFile() {
-        const strings = Object.keys(this.Files).map(
-            (strapiName: string) => {
-                const inter = this.Files[strapiName];
-                return `export * from '${inter.getRelativeRootPath()}'`;
-            }
-        );
+        const strings = Object.keys(this.Files).map((strapiName: string) => {
+            const inter = this.Files[strapiName];
+            return `export * from '${inter.getRelativeRootPath()}'`;
+        });
         const fileData = strings.join('\n');
         const formattedFileData = prettier.format(
             fileData,

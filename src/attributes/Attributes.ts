@@ -105,7 +105,8 @@ export default class Attributes {
         const orNull = ' | null';
         // TODO: only add this in non paranoid mode
         /* const requiredString = attr.required !== true ? orNull : ''; */
-        const requiredString = attr?.[CERTAINLY_REQUIRED_KEY] === true ? '' : orNull;
+        const requiredString =
+            attr?.[CERTAINLY_REQUIRED_KEY] === true ? '' : orNull;
         let str = `    ${attrName}${optionalString}: `;
         let isArray = false;
         switch (attr.type) {
@@ -131,7 +132,8 @@ export default class Attributes {
                 str += `{ data: `;
                 str += dependencyName;
                 // TODO: assert correctly
-                const relationInterface = this.RelationNames[apiName].file as Interface;
+                const relationInterface = this.RelationNames[apiName]
+                    .file as Interface;
                 if (relationInterface.hasPopulatableAttributes()) {
                     str += '<';
                     str += `${this.RelationNames['builtins::ExtractNested'].name}<${POPULATE_GENERIC_NAME}, '${attrName}'>`;

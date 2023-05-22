@@ -31,7 +31,9 @@ export default class Interface extends File {
         this.Attributes = attributes;
 
         if (!attributes) {
-            console.warn(`Warning: attributes for ${this.getStrapiName()} is empty!`)
+            console.warn(
+                `Warning: attributes for ${this.getStrapiName()} is empty!`
+            );
         }
     }
 
@@ -99,9 +101,7 @@ export default class Interface extends File {
             strArr.push(', ');
             // second generic for required by
             strArr.push(
-                `${
-                    this.RelationNames['builtins::ExtractFlat'].name
-                }<${POPULATE_GENERIC_NAME}>`
+                `${this.RelationNames['builtins::ExtractFlat'].name}<${POPULATE_GENERIC_NAME}>`
             );
             // close the required by
             strArr.push('>');
