@@ -8,7 +8,11 @@ import { StrapiComponent } from './types/component';
 import { strapiContentType } from './types/content-type';
 
 export class ByFileContentTypeReader implements ContentTypeReader {
-    constructor(private readonly strapiSrcRoot: string) { }
+    private readonly strapiSrcRoot: string;
+
+    constructor(strapiRoot: string) {
+        this.strapiSrcRoot = join(strapiRoot, 'src');
+    }
 
     async readComponents() {
         const categories = await this.getComponentCategoryFolders();

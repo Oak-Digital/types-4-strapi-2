@@ -4,6 +4,7 @@ import { ByFileContentTypeReader } from './readers/by-file';
 import { BasicWriter } from './writers/basic-writer';
 import prettier from 'prettier';
 import { LoadStrapiReader } from './readers/load-strapi';
+import { ContentTypeReader } from './readers/types/content-type-reader';
 
 program.name('t4s');
 
@@ -52,6 +53,7 @@ const {
     fileCase: fileCaseType,
     folderCase: folderCaseType,
     plugins,
+    reader: readerName,
 } = options;
 
 (async () => {
@@ -69,8 +71,17 @@ const {
         };
     }
 
-    /* const reader = new ByFileContentTypeReader(input); */
-    const reader = new LoadStrapiReader(input);
+    let reader: ContentTypeReader;
+    switch (readerName) {
+        case 'by-file':
+            reader = new ByFileContentTypeReader(input);
+            break;
+        case 'load-strapi':
+            reader = new LoadStrapiReader(input);
+            break;
+        default:
+            throw new Error(`Unknown reader: ${readerName}`);
+    }
     const writer = new BasicWriter(out, {
         deleteOld,
         prettierOptions,
