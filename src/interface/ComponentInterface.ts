@@ -1,3 +1,4 @@
+import { pascalCase } from 'change-case';
 import { POPULATE_GENERIC_NAME } from '../constants';
 import { Namespace } from '../readers/types/content-type-reader';
 import { caseType } from '../utils/casing';
@@ -42,6 +43,10 @@ export default class ComponentInterface extends Interface {
 
     updateStrapiName() {
         this.StrapiName = `${this.Category}.${this.getBaseName()}`;
+    }
+
+    getFullName() {
+        return pascalCase(`${this.NamePrefix}.${this.getBaseName()}`);
     }
 
     // TODO: make this more dynamic in parent

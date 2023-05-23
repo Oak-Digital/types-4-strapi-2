@@ -17,7 +17,7 @@ import { AttributeWithNested } from './builtinInterfaces';
 import { Namespace } from '../readers/types/content-type-reader';
 
 export default class Interface extends File {
-    private NamePrefix = '';
+    protected NamePrefix = '';
     protected Attributes: Record<string, AttributeWithNested>;
     protected CollectionName: string | null;
     protected Namespace: Namespace;
