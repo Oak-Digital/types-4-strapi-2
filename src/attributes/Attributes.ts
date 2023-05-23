@@ -1,9 +1,11 @@
 import { CERTAINLY_REQUIRED_KEY, POPULATE_GENERIC_NAME } from '../constants';
 import { RelationNames } from '../file/File';
+import { AttributeWithNested } from '../interface/builtinInterfaces';
 import Interface from '../interface/Interface';
+import { ContentTypeAttribute } from '../readers/types/attributes';
 
 export default class Attributes {
-    Attrs: Record<string, Record<string, any>>;
+    Attrs: Record<string, AttributeWithNested>;
     private RelationNames: RelationNames = {};
 
     constructor(
@@ -14,7 +16,7 @@ export default class Attributes {
         this.RelationNames = relationNames;
     }
 
-    isAttributePopulatable(attr: any): boolean {
+    isAttributePopulatable(attr: AttributeWithNested): boolean {
         // If it is a component / relation / dynamiczone it is always optional due to population
         switch (attr.type) {
             case 'nested':
@@ -68,6 +70,9 @@ export default class Attributes {
                     deps.forEach((dep) => dependencies.add(dep));
                     break;
                 case 'relation':
+                    if (attr.relation === 'morphToMany') {
+                        break;
+                    }
                     dependencies.add(attr.target);
                     break;
                 case 'component':
@@ -98,14 +103,15 @@ export default class Attributes {
         return Array.from(dependencies);
     }
 
-    attributeToString(attrName: string, attr: any) {
+    attributeToString(attrName: string, attr: AttributeWithNested) {
         const isPopulatable = this.isAttributePopulatable(attr);
         const isOptional = isPopulatable;
         const optionalString = isOptional ? '?' : '';
         const orNull = ' | null';
         // TODO: only add this in non paranoid mode
         /* const requiredString = attr.required !== true ? orNull : ''; */
-        const requiredString = attr?.[CERTAINLY_REQUIRED_KEY] === true ? '' : orNull;
+        const requiredString =
+            attr?.[CERTAINLY_REQUIRED_KEY] === true ? '' : orNull;
         let str = `    ${attrName}${optionalString}: `;
         let isArray = false;
         switch (attr.type) {
@@ -121,6 +127,10 @@ export default class Attributes {
                 str += newAttrs.toString() + nullableString;
                 break;
             case 'relation':
+                if (attr.relation === 'morphToMany') {
+                    str += 'any';
+                    break;
+                }
                 const apiName = attr.target;
                 // console.log(this.RelationNames, apiName)
                 const dependencyName =
@@ -130,8 +140,14 @@ export default class Attributes {
                     : orNull;
                 str += `{ data: `;
                 str += dependencyName;
-                // TODO: assert correctly
-                const relationInterface = this.RelationNames[apiName].file as Interface;
+                const relationInterfaceWrapped = this.RelationNames[apiName];
+                if (!relationInterfaceWrapped) {
+                    throw new Error(`Could not find relation ${apiName}, consider using another reader.`);
+                }
+                const relationInterface = relationInterfaceWrapped.file;
+                if (!(relationInterface instanceof Interface)) {
+                    throw new Error(`t4s internal error: Expected relation ${apiName} to be an interface, but it was not. Please open an issue on the GitHub repository.`);
+                }
                 if (relationInterface.hasPopulatableAttributes()) {
                     str += '<';
                     str += `${this.RelationNames['builtins::ExtractNested'].name}<${POPULATE_GENERIC_NAME}, '${attrName}'>`;
@@ -144,7 +160,10 @@ export default class Attributes {
                 const componentName = attr.component;
                 const relationNameObj = this.RelationNames[componentName];
                 // TODO: assert correctly
-                const componentInterface = relationNameObj.file as Interface;
+                const componentInterface = relationNameObj.file;
+                if (!(componentInterface instanceof Interface)) {
+                    throw new Error(`t4s internal error: Expected component ${componentName} to be an interface, but it was not. Please open an issue on the GitHub repository.`);
+                }
                 /* console.log(this.RelationNames); */
                 const dependencyComponentName: string = relationNameObj.name;
                 /* isArray = attr.repeatable ?? false; */
@@ -184,8 +203,14 @@ export default class Attributes {
                 const relations = attr.components.map(
                     (componentName: string) => {
                         const component = this.RelationNames[componentName];
+                        if (!component) {
+                            throw new Error(`Could not find component ${componentName}, consider using another reader.`);
+                        }
                         // in this context file should always be an interface
-                        const file = component.file as Interface;
+                        const file = component.file;
+                        if (!(file instanceof Interface)) {
+                            throw new Error(`t4s internal error: Expected component ${componentName} to be an interface, but it was not. Please open an issue on the GitHub repository.`);
+                        }
                         const populatable = file.hasPopulatableAttributes();
                         /* false; */
                         const populatableString = populatable

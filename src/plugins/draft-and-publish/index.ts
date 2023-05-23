@@ -1,12 +1,17 @@
-import { CERTAINLY_REQUIRED_KEY } from "../../constants";
-import { Events } from "../../events";
-import { HookTypes } from "../PluginManager";
-import { PluginRegister } from "../types";
+import { CERTAINLY_REQUIRED_KEY } from '../../constants';
+import { Events } from '../../events';
+import { HookTypes } from '../PluginManager';
+import { PluginRegister } from '../types';
 
-const addFieldsToContentTypes: HookTypes['AfterReadSchema'] = (state, schema) => {
+const addFieldsToContentTypes: HookTypes['AfterReadSchema'] = (
+    state,
+    schema
+) => {
     const { apiSchemas } = schema;
-    apiSchemas.forEach(({ name, schema }) => {
-        const { attributes, options = {} } = schema;
+
+    Object.entries(apiSchemas).forEach(([strapiName, schema]) => {
+
+        const { attributes, options = {} } = schema.contentType;
         if (options?.draftAndPublish !== true) {
             return;
         }
@@ -30,6 +35,6 @@ const register: PluginRegister = () => {
             },
         ],
     };
-}
+};
 
 export default register;

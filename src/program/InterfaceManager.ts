@@ -1,17 +1,9 @@
-import { existsSync } from 'fs';
-import { mkdir, rm, writeFile } from 'fs/promises';
-import { join, dirname } from 'path/posix';
 import {
     createMediaFormatInterface,
     createMediaInterface,
 } from '../interface/builtinInterfaces';
 import ComponentInterface from '../interface/ComponentInterface';
 import Interface from '../interface/Interface';
-import {
-    getApiSchemas,
-    getComponentCategoryFolders,
-    getComponentSchemas,
-} from '../content-types/reader';
 import prettier from 'prettier';
 import { pascalCase } from 'change-case';
 import {
@@ -29,47 +21,102 @@ import {
 import { PluginManager } from '../plugins/PluginManager';
 import { File } from '../file/File';
 import { createExtraTypes } from '../extra-types/createExtraTypes';
+import { ContentTypeReader } from '../readers/types/content-type-reader';
+import { InterfaceWriter } from '../writers/types/writer';
+
+type InterfaceManagerOptions = {
+    /**
+     * @default 'I'
+     * @type {string}
+     * @description The prefix to use for all interfaces
+     */
+    prefix?: string;
+    /**
+     * @default true
+     * @type {boolean}
+     * @description Whether to use the category prefix for component interfaces
+     */
+    useCategoryPrefix?: boolean;
+    /**
+     * @default ''
+     * @type {string}
+     * @description The prefix to use for component interfaces
+     */
+    componentPrefix?: string;
+    /**
+     * @default false
+     * @type {boolean}
+     * @description Whether to use only the component prefix for component interfaces
+     */
+    componentPrefixOverridesPrefix?: boolean;
+    /**
+     * @default ''
+     * @type {string}
+     * @description The prefix to use for builtin interfaces
+     */
+    /* builtinsPrefix?: string; */
+    /**
+     * @default false
+     * @type {boolean}
+     * @description Whether to use only the builtin prefix for builtin interfaces
+     */
+    /* builtinsPrefixOverridesPrefix?: boolean; */
+    /**
+     * @default null
+     * @type {string}
+     * @description The path to the prettier config file
+     */
+    fileCaseType?: caseType;
+    /**
+     * @default 'kebab'
+     * @type {caseType}
+     * @description The case type to use for folder names
+     */
+    folderCaseType?: caseType;
+    /**
+     * @default []
+     * @type {SupportedPluginNamesType[]}
+     * @description The plugins to use
+     */
+    enabledPlugins?: SupportedPluginNamesType[];
+}
 
 export default class InterfaceManager {
     private Files: Record<string, File> = {}; // string = strapi name
-    private OutRoot: string;
-    private StrapiSrcRoot: string;
-    private Options: typeof InterfaceManager.BaseOptions;
-    private PrettierOptions: any;
+    private Options: InterfaceManagerOptions;
     private PluginManager: PluginManager;
     private dependenciesInjected: boolean = false;
-
-    static BaseOptions = {
-        prefix: 'I',
-        useCategoryPrefix: true,
-        componentPrefix: '',
-        componentPrefixOverridesPrefix: false,
-        builtinsPrefix: '', // TODO: make this work
-        builtinsPrefixOverridesPrefix: false, // TODO: make this work
-        deleteOld: false,
-        prettierFile: null,
-        fileCaseType: 'pascal' as caseType,
-        folderCaseType: 'kebab' as caseType,
-        enabledPlugins: <SupportedPluginNamesType[]>[],
-    };
+    private contentTypeReader: ContentTypeReader;
+    private interfaceWriter: InterfaceWriter;
 
     constructor(
-        outRoot: string,
-        strapiSrcRoot: string,
-        options: Partial<typeof InterfaceManager['BaseOptions']> = {}
+        reader: ContentTypeReader,
+        writer: InterfaceWriter,
+        {
+        prefix = 'I',
+        useCategoryPrefix = true,
+        componentPrefix = '',
+        componentPrefixOverridesPrefix = false,
+        /* builtinsPrefix = '', */
+        /* builtinsPrefixOverridesPrefix = false, */
+        fileCaseType = 'pascal',
+        folderCaseType = 'kebab',
+        enabledPlugins = [],
+        }: Partial<InterfaceManagerOptions> = {}
     ) {
-        this.OutRoot = outRoot;
-        this.StrapiSrcRoot = strapiSrcRoot;
+        this.contentTypeReader = reader;
+        this.interfaceWriter = writer;
         this.Options = {
-            ...InterfaceManager.BaseOptions,
-            ...options,
+            prefix,
+            useCategoryPrefix,
+            componentPrefix,
+            componentPrefixOverridesPrefix,
+            /* builtinsPrefix, */
+            /* builtinsPrefixOverridesPrefix, */
+            fileCaseType,
+            folderCaseType,
+            enabledPlugins,
         };
-        // Make sure all options are set
-        Object.keys(this.Options).map((name) => {
-            if (this.Options[name] === undefined) {
-                this.Options[name] = InterfaceManager.BaseOptions[name];
-            }
-        });
         this.PluginManager = new PluginManager();
         this.validateOptions();
         this.registerBuiltinPlugins();
@@ -91,8 +138,7 @@ export default class InterfaceManager {
     validateOptions() {
         if (!checkCaseType(this.Options.fileCaseType)) {
             throw new Error(
-                `${
-                    this.Options.fileCaseType
+                `${this.Options.fileCaseType
                 } is not a supported type, please use one of the following ${caseTypesArray.join(
                     ', '
                 )}`
@@ -100,8 +146,7 @@ export default class InterfaceManager {
         }
         if (!checkCaseType(this.Options.folderCaseType)) {
             throw new Error(
-                `${
-                    this.Options.folderCaseType
+                `${this.Options.folderCaseType
                 } is not a supported type, please use one of the following ${caseTypesArray.join(
                     ', '
                 )}`
@@ -119,28 +164,13 @@ export default class InterfaceManager {
         });
     }
 
-    async loadPrettierConfig() {
-        const defaultOptions = {
-            parser: 'typescript',
-        };
-        if (!this.Options.prettierFile) {
-            this.PrettierOptions = defaultOptions;
-            return;
-        }
-        const resolved = await prettier.resolveConfig(
-            this.Options.prettierFile,
-            {
-                editorconfig: true,
-            }
-        );
-        this.PrettierOptions = Object.assign({}, defaultOptions, resolved);
-    }
-
     async readSchemas() {
-        const apiSchemasPre = [];
-        const componentSchemasPre = [];
-        const apiSchemasPromise = getApiSchemas(this.StrapiSrcRoot);
-        const componentSchemasPromise = getComponentSchemas(this.StrapiSrcRoot);
+        const apiSchemasPre = {};
+        const componentSchemasPre = {};
+
+        const apiSchemasPromise = this.contentTypeReader.readContentTypes();
+        const componentSchemasPromise = this.contentTypeReader.readComponents();
+
         this.PluginManager.invoke(Events.BeforeReadSchema, this, {
             apiSchemas: apiSchemasPre,
             componentSchemas: componentSchemasPre,
@@ -151,9 +181,12 @@ export default class InterfaceManager {
             componentSchemasPromise,
         ]);
 
-        const newObject = {
-            apiSchemas: [...apiSchemasPre, ...apiSchemas],
-            componentSchemas: [...componentSchemasPre, ...componentSchemas],
+        const newObject: {
+            apiSchemas: typeof apiSchemas;
+            componentSchemas: typeof componentSchemas;
+        } = {
+            apiSchemas: { ...apiSchemasPre, ...apiSchemas },
+            componentSchemas: { ...componentSchemasPre, ...componentSchemas },
         };
 
         this.PluginManager.invoke(Events.AfterReadSchema, this, newObject);
@@ -163,7 +196,9 @@ export default class InterfaceManager {
 
     public addType(name: string, file: File, force: boolean = false) {
         if (this.dependenciesInjected) {
-            console.warn('You should not add types after dependencies have been injected');
+            console.warn(
+                'You should not add types after dependencies have been injected'
+            );
         }
         if (this.Files[name] && !force) {
             return false;
@@ -178,47 +213,51 @@ export default class InterfaceManager {
         const { apiSchemas, componentSchemas } = await this.readSchemas();
         this.PluginManager.invoke(Events.BeforeReadSchemas, this);
 
-        apiSchemas.forEach((schema) => {
-            const { name, schema: { attributes } } = schema;
-            const strapiName = `api::${name}.${name}`;
+        Object.entries(apiSchemas).forEach(([name, schema]) => {
+            let strapiName = name;
+            if (schema.namespace === 'admin') {
+                strapiName = `admin::${schema.name}`;
+            } else {
+                /* strapiName = `${schema.namespace}::${schema.collection}.${schema.name}`; */
+            }
+            const attributes = schema.contentType.attributes;
             const inter = new Interface(
-                name,
+                schema.name,
+                schema.namespace,
                 attributes,
                 './',
+                schema.collection,
                 this.Options.fileCaseType,
                 this.Options.prefix
             );
-            this.addType(strapiName, inter)
+            this.addType(strapiName, inter);
         });
 
-        componentSchemas.forEach((category) => {
-            const categoryName: string = category.category;
-            category.schemas.forEach(({ name, schema }) => {
-                const componentName = name;
-                const strapiName = `${categoryName}.${name}`;
-                const componentPrefix = `${this.Options.componentPrefix}${
-                    this.Options.useCategoryPrefix
-                        ? pascalCase(categoryName)
-                        : ''
+        Object.entries(componentSchemas).forEach(([name, schema]) => {
+            const strapiName = name;
+            const componentName = name.split('.')[1];
+            const categoryName = name.split('.')[0];
+            const attributes = schema.attributes;
+            const componentPrefix = `${this.Options.componentPrefix}${this.Options.useCategoryPrefix ? pascalCase(categoryName) : ''
                 }`;
-                const prefix = this.Options.componentPrefixOverridesPrefix
-                    ? componentPrefix
-                    : this.Options.prefix + componentPrefix;
-                const categoryFolderName = changeCase(
-                    categoryName,
-                    this.Options.folderCaseType
-                );
-                // make component interface
-                const inter = new ComponentInterface(
-                    componentName,
-                    schema.attributes,
-                    `./${categoryFolderName}`,
-                    categoryName,
-                    this.Options.fileCaseType,
-                    prefix
-                );
-                this.addType(strapiName, inter)
-            });
+            const prefix = this.Options.componentPrefixOverridesPrefix
+                ? componentPrefix
+                : this.Options.prefix + componentPrefix;
+            const categoryFolderName = changeCase(
+                categoryName,
+                this.Options.folderCaseType
+            );
+            // make component interface
+            const inter = new ComponentInterface(
+                componentName,
+                'api',
+                schema.attributes,
+                `./${categoryFolderName}`,
+                categoryName,
+                this.Options.fileCaseType,
+                prefix
+            );
+            this.addType(strapiName, inter);
         });
 
         this.PluginManager.invoke(Events.AfterReadSchemas, this);
@@ -226,19 +265,17 @@ export default class InterfaceManager {
 
     createBuiltinInterfaces() {
         // Interfaces
-        const outDirName = changeCase('builtins', this.Options.folderCaseType);
-        const outDir = `./${outDirName}`;
+        /* const outDirName = changeCase('builtins', this.Options.folderCaseType); */
+        /* const outDir = `./${outDirName}`; */
         const builtinInterfaces = [];
         builtinInterfaces.push(
             createMediaInterface(
-                outDir,
                 this.Options.fileCaseType,
                 this.Options.prefix
             )
         );
         builtinInterfaces.push(
             createMediaFormatInterface(
-                outDir,
                 this.Options.fileCaseType,
                 this.Options.prefix
             )
@@ -249,9 +286,7 @@ export default class InterfaceManager {
 
         // Types
         const types = [];
-        types.push(
-            ...createExtraTypes()
-        );
+        types.push(...createExtraTypes());
 
         types.forEach((t) => {
             this.addType(t.getStrapiName(), t);
@@ -260,7 +295,7 @@ export default class InterfaceManager {
 
     // Inject dependencies into all interfaces
     injectDependencies() {
-        this.PluginManager.invoke(Events.BeforeInjectDependencies, this)
+        this.PluginManager.invoke(Events.BeforeInjectDependencies, this);
 
         Object.keys(this.Files).forEach((strapiName: string) => {
             const file = this.Files[strapiName];
@@ -275,112 +310,19 @@ export default class InterfaceManager {
         });
 
         this.dependenciesInjected = true;
-        this.PluginManager.invoke(Events.AfterInjectDependencies, this)
-    }
-
-    async deleteOldFolders() {
-        await rm(this.OutRoot, {
-            force: true,
-            recursive: true,
-        });
-    }
-
-    async makeFolders() {
-        if (this.Options.deleteOld) {
-            await this.deleteOldFolders();
-        }
-        const componentCategories = await getComponentCategoryFolders(
-            this.StrapiSrcRoot
-        );
-        if (!existsSync(this.OutRoot)) {
-            await mkdir(this.OutRoot, {
-                recursive: true,
-            });
-        }
-        const promises = [];
-        const componentCategoriesPromises = componentCategories.map(
-            async (category) => {
-                const folderName = changeCase(
-                    category,
-                    this.Options.folderCaseType
-                );
-                const path = join(this.OutRoot, folderName);
-                if (existsSync(path)) {
-                    return;
-                }
-                await mkdir(path);
-            }
-        );
-        promises.push(...componentCategoriesPromises);
-        const builintsFolderName = changeCase(
-            'builtins',
-            this.Options.folderCaseType
-        );
-        const builtinsPath = join(this.OutRoot, builintsFolderName);
-        if (!existsSync(builtinsPath)) {
-            promises.push(mkdir(builtinsPath));
-        }
-
-        await Promise.all(promises);
-    }
-
-    async writeInterfaces() {
-        /* const types = [ */
-        /*     requiredByString, */
-        /*     extractNestedString, */
-        /*     extractFlatString, */
-        /* ]; */
-        /* const writeTypesPromises = types.map((t) => { */
-        /*      */
-        /* }); */
-        const writePromises = Object.keys(this.Files).map(
-            async (strapiName) => {
-                const file = this.Files[strapiName];
-                const fileData = file.toString();
-                const formattedFileData = prettier.format(
-                    fileData,
-                    this.PrettierOptions
-                );
-                const filePath = join(
-                    this.OutRoot,
-                    file.getRelativeRootPathFile()
-                );
-                await mkdir(dirname(filePath), {
-                    recursive: true,
-                });
-                await writeFile(filePath, formattedFileData);
-            }
-        );
-        await Promise.all(writePromises);
-    }
-
-    async writeIndexFile() {
-        const strings = Object.keys(this.Files).map(
-            (strapiName: string) => {
-                const inter = this.Files[strapiName];
-                return `export * from '${inter.getRelativeRootPath()}'`;
-            }
-        );
-        const fileData = strings.join('\n');
-        const formattedFileData = prettier.format(
-            fileData,
-            this.PrettierOptions
-        );
-        const filePath = join(this.OutRoot, 'index.ts');
-        await writeFile(filePath, formattedFileData);
+        this.PluginManager.invoke(Events.AfterInjectDependencies, this);
     }
 
     async run() {
         try {
             const createInterfacesPromise = this.createInterfaces();
-            const makeFoldersPromise = this.makeFolders();
-            const loadPrettierPromise = this.loadPrettierConfig();
             this.createBuiltinInterfaces();
             await createInterfacesPromise;
             // Create all interfaces before injecting
             this.injectDependencies();
-            await Promise.all([makeFoldersPromise, loadPrettierPromise]);
-            await Promise.all([this.writeInterfaces(), this.writeIndexFile()]);
+            await this.interfaceWriter.write(
+                Object.keys(this.Files).map((key) => this.Files[key])
+            );
         } catch (err) {
             console.error(err);
         }

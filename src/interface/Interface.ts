@@ -13,31 +13,43 @@ import {
 } from 'change-case';
 import { POPULATE_GENERIC_NAME } from '../constants';
 import { File } from '../file/File';
+import { AttributeWithNested } from './builtinInterfaces';
+import { Namespace } from '../readers/types/content-type-reader';
 
 export default class Interface extends File {
     private NamePrefix = '';
-    protected Attributes: any;
+    protected Attributes: Record<string, AttributeWithNested>;
+    protected CollectionName: string | null;
+    protected Namespace: Namespace;
 
     constructor(
         baseName: string,
-        attributes: any,
+        namespace: Namespace,
+        attributes: Record<string, AttributeWithNested>,
         relativeDirectoryPath: string,
+        collectionName: string | null = null,
         fileCaseType: caseType = 'pascal',
         prefix = ''
     ) {
-        super(baseName, relativeDirectoryPath, fileCaseType);
+        super(baseName, join(namespace, relativeDirectoryPath), fileCaseType);
+        this.CollectionName = collectionName;
+        this.Namespace = namespace;
         this.updateStrapiName();
         this.NamePrefix = prefix;
         this.Attributes = attributes;
 
         if (!attributes) {
-            console.warn(`Warning: attributes for ${this.getStrapiName()} is empty!`)
+            console.warn(
+                `Warning: attributes for ${this.getStrapiName()} is empty!`
+            );
         }
     }
 
     protected updateStrapiName() {
-        // TODO: add support for api name
-        this.StrapiName = `api::${this.BaseName}.${this.BaseName}`;
+        const collectionString = this.CollectionName
+            ? `${this.CollectionName}.`
+            : '';
+        this.StrapiName = `${this.Namespace}::${collectionString}${this.BaseName}`;
     }
 
     getStrapiName() {
@@ -49,9 +61,21 @@ export default class Interface extends File {
     }
 
     getFullName() {
+        let name;
+        if (this.Namespace === 'admin') {
+            name = `Admin${this.BaseName}`;
+        } else if (this.CollectionName === null) {
+            name = this.BaseName;
+        } else if (this.CollectionName === this.BaseName) {
+            name = this.BaseName;
+        } else {
+            name = this.StrapiName.split('::').pop();
+        }
+
         // TODO: use correct casing from options
-        const pascalName = pascalCase(this.BaseName);
-        return `${this.NamePrefix}${pascalName}`;
+        const pascalName = pascalCase(name);
+        const fullName = `${this.NamePrefix}${pascalName}`;
+        return fullName;
     }
 
     hasPopulatableAttributes() {
@@ -99,9 +123,7 @@ export default class Interface extends File {
             strArr.push(', ');
             // second generic for required by
             strArr.push(
-                `${
-                    this.RelationNames['builtins::ExtractFlat'].name
-                }<${POPULATE_GENERIC_NAME}>`
+                `${this.RelationNames['builtins::ExtractFlat'].name}<${POPULATE_GENERIC_NAME}>`
             );
             // close the required by
             strArr.push('>');

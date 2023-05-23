@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "collection_1s",
+  "info": {
+    "singularName": "collection-1",
+    "pluralName": "collection-1s",
+    "displayName": "Collection 1"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "text": {
+      "type": "string"
+    }
+  }
+}

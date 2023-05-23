@@ -1,9 +1,6 @@
-import { HooksType } from "./PluginManager";
+import { HooksType } from './PluginManager';
 
-export const supportedPluginNames = [
-    'url-alias',
-    'i18n',
-] as const;
+export const supportedPluginNames = ['url-alias', 'i18n'] as const;
 
 export type SupportedPluginNamesType = typeof supportedPluginNames[number];
 

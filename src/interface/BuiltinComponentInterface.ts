@@ -11,9 +11,10 @@ export default class BuiltinComponentInterface extends ComponentInterface {
     ) {
         super(
             baseName,
+            'builtins',
             attributes,
             relativeDirectoryPath,
-            'builtins',
+            '',
             fileCase,
             prefix,
             {

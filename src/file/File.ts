@@ -1,8 +1,8 @@
-import { prefixDotSlash } from "../utils";
+import { prefixDotSlash } from '../utils';
 import { dirname, join, relative } from 'path/posix';
-import { caseType, changeCase } from "../utils/casing";
+import { caseType, changeCase } from '../utils/casing';
 
-export type RelationNames = Record<string, { name: string, file: File }>;
+export type RelationNames = Record<string, { name: string; file: File }>;
 
 export abstract class File {
     private Relations: File[] = []; // Components and relations
@@ -13,7 +13,11 @@ export abstract class File {
     private RelativeDirectoryPath: string;
     protected FileCase: caseType;
 
-    constructor(baseName: string, relativeDirectoryPath: string, fileCaseType: caseType = 'pascal') {
+    constructor(
+        baseName: string,
+        relativeDirectoryPath: string,
+        fileCaseType: caseType = 'pascal'
+    ) {
         this.BaseName = baseName;
         this.StrapiName = '';
         this.FileCase = fileCaseType;
@@ -68,17 +72,27 @@ export abstract class File {
     }
 
     protected getTsImports() {
-        return Object.keys(this.RelationNames).map((strapiName: string) => {
-            if (strapiName === this.getStrapiName()) {
-                return '';
-            }
-            const relationName = this.RelationNames[strapiName].name;
-            const inter = this.RelationNames[strapiName].file;
-            const importPath = prefixDotSlash(relative(this.getRelativeRootDir(), inter.getRelativeRootPath()));
-            const fullName = inter.getFullName();
-            const importNameString = fullName === relationName ? fullName : `${fullName} as ${relationName}`;
-            return `import { ${importNameString} } from '${importPath}';`;
-        }).filter(s => s).join('\n');
+        return Object.keys(this.RelationNames)
+            .map((strapiName: string) => {
+                if (strapiName === this.getStrapiName()) {
+                    return '';
+                }
+                const relationName = this.RelationNames[strapiName].name;
+                const inter = this.RelationNames[strapiName].file;
+                const importPath = prefixDotSlash(
+                    relative(
+                        this.getRelativeRootDir(),
+                        inter.getRelativeRootPath()
+                    )
+                );
+                const fullName = inter.getFullName();
+                const importNameString =
+                    fullName === relationName
+                        ? fullName
+                        : `${fullName} as ${relationName}`;
+                return `import { ${importNameString} } from '${importPath}';`;
+            })
+            .filter((s) => s)
+            .join('\n');
     }
-
 }

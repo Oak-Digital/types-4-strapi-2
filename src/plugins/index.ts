@@ -6,7 +6,7 @@ import { PluginManager } from './PluginManager';
 
 export const registerBuiltinPlugins = (
     pluginManager: PluginManager,
-    pluginNames: Set<SupportedPluginNamesType>,
+    pluginNames: Set<SupportedPluginNamesType>
 ) => {
     // Draft and publish is always registered since it is built into Strapi
     pluginManager.registerPlugin(registerDraftAndPublish());
