@@ -106,7 +106,6 @@ export class ByFileContentTypeReader implements ContentTypeReader {
         const schemaData = await readFile(schemaPath);
         try {
             const object = JSON.parse(schemaData.toString());
-            console.log(object);
             const schema = strapiContentType.parse(object);
             return schema;
         } catch (e) {
