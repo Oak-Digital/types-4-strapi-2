@@ -6,6 +6,7 @@
     "declaration": true,            /* Concatenate & emit output to single file.*/
     "outDir": "lib",                /* Redirect output to the directory. */
     "types": [ "node" ],
+    "allowJs": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,        /* Enables intero between CommonJS and ES */
     "skipLibCheck": true            /* Skip type checking of declaration files. */
