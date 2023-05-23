@@ -157,6 +157,10 @@ export default (plugin: any) => {
 }
 ```
 
+## API
+
+The api is not finished, so it may change over time.
+
 ## Building
 
 To build this project, use the following command
