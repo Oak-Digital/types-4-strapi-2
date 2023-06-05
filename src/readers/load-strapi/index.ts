@@ -83,7 +83,7 @@ export class LoadStrapiReader implements ContentTypeReader {
             });
 
             remote.on('close', () => {
-                resolve(data.map((b) => b?.toString()).join(''));
+                resolve(data.map((b) => b?.toString() ?? '').join(''));
             });
 
             remote.on('error', (err) => {
@@ -94,7 +94,7 @@ export class LoadStrapiReader implements ContentTypeReader {
         try {
             jsonParsed = JSON.parse(output);
         } catch (err) {
-            console.error(err, output.slice(0, 100));
+            console.error(err, output);
             throw new Error('Failed to parse output from remote strapi');
         }
 
