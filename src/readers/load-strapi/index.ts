@@ -63,7 +63,8 @@ export class LoadStrapiReader implements ContentTypeReader {
     private async loadStrapi() {
         const localRemoteFile = join(__dirname, 'remote.js');
 
-        let root =
+        // TODO: Make better check if the path is absolute or not
+        const root =
             this.strapiRoot.startsWith('/') ||
             this.strapiRoot.startsWith('\\') ||
             this.strapiRoot.startsWith('~')
@@ -84,8 +85,12 @@ export class LoadStrapiReader implements ContentTypeReader {
                 cwd: this.strapiRoot,
             });
 
-            console.log(remoteRemoteFile, this.strapiRoot);
             const errData = [];
+
+            remote.stderr.on('data', (chunk) => {
+                errData.push(chunk);
+            });
+
             remote.on('close', async (code) => {
                 if (code !== 0) {
                     reject(
@@ -104,32 +109,6 @@ export class LoadStrapiReader implements ContentTypeReader {
                     reject(err);
                 }
             });
-
-            // const data = [];
-            // const errData = [];
-            // remote.stdout.on('data', (chunk) => {
-            //     data.push(chunk);
-            // });
-
-            remote.stderr.on('data', (chunk) => {
-                errData.push(chunk);
-            });
-
-            // remote.on('close', () => {
-            //     if (errData.length > 0) {
-            //         reject(
-            //             new Error(
-            //                 `Failed to spawn remote strapi: ${errData
-            //                     .map((b) => b?.toString() ?? '')
-            //                     .join('')}`
-            //             )
-            //         );
-            //         return;
-            //     }
-            //     setTimeout(() => {
-            //         resolve(data.map((b) => b?.toString() ?? '').join(''));
-            //     }, 1000);
-            // });
         });
 
         if (output.length <= 0) {
