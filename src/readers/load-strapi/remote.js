@@ -1,6 +1,7 @@
 // remote.js should be started with it's cwd in the strapi project's root
 
 const Strapi = require('@strapi/strapi');
+const fs = require('fs/promises');
 
 (async () => {
     const base = await Strapi({
@@ -14,7 +15,11 @@ const Strapi = require('@strapi/strapi');
 
     await instance.server.mount();
 
-    console.log(JSON.stringify([instance.contentTypes, instance.components]));
+    // console.log(JSON.stringify([instance.contentTypes, instance.components]));
+    await fs.writeFile(
+        '.t4s.contentTypes.json',
+        JSON.stringify([instance.contentTypes, instance.components])
+    );
 
     const dbSettings = instance.config.get('database.connection');
 

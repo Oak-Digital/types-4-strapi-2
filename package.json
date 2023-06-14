@@ -10,7 +10,8 @@
     "testtypes": "node ./bin/index.js",
     "lint": "eslint src/",
     "prettier": "prettier --write \"src/**/*.ts\"",
-    "t4s": "node ./bin/index.js"
+    "t4s": "node ./bin/index.js",
+    "testdev": "ts-node ./src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
     "@typescript-eslint/parser": "^5.33.1",
     "eslint": "^8.22.0",
     "rimraf": "^4.4.1",
+    "ts-node": "^10.9.1",
     "typescript": "^4.7.4"
   },
   "dependencies": {
