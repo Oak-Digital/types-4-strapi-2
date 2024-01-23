@@ -8,7 +8,7 @@ export const baseAttribute = z.object({
 });
 
 export const textAttribute = baseAttribute.extend({
-    type: z.enum(['text', 'string'])
+    type: z.enum(['text', 'string']),
 });
 
 export type TextAttribute = z.infer<typeof textAttribute>;
@@ -152,6 +152,11 @@ export const morphToManyAttribute = z.object({
     relation: z.literal('morphToMany'),
 });
 
+export const morphOneAttribute = z.object({
+    type: z.literal('relation'),
+    relation: z.literal('morphToOne'),
+});
+
 export const relationAttribute = z.union([
     hasOneAttribute,
     oneToOneAttribute,
@@ -160,6 +165,7 @@ export const relationAttribute = z.union([
     manyToManyAttribute,
     hasManyAttribute,
     morphToManyAttribute,
+    morphOneAttribute,
 ]);
 
 export type RelationAttribute = z.infer<typeof relationAttribute>;
@@ -197,9 +203,6 @@ export const attribute = z.union([
 
 export type Attribute = z.infer<typeof attribute>;
 
-export const contentTypeAttribute = z.union([
-    attribute,
-    dynamiczoneAttribute,
-]);
+export const contentTypeAttribute = z.union([attribute, dynamiczoneAttribute]);
 
 export type ContentTypeAttribute = z.infer<typeof contentTypeAttribute>;

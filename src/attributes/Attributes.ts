@@ -70,7 +70,10 @@ export default class Attributes {
                     deps.forEach((dep) => dependencies.add(dep));
                     break;
                 case 'relation':
-                    if (attr.relation === 'morphToMany') {
+                    if (
+                        attr.relation === 'morphToMany' ||
+                        attr.relation === 'morphToOne'
+                    ) {
                         break;
                     }
                     dependencies.add(attr.target);
@@ -127,7 +130,10 @@ export default class Attributes {
                 str += newAttrs.toString() + nullableString;
                 break;
             case 'relation':
-                if (attr.relation === 'morphToMany') {
+                if (
+                    attr.relation === 'morphToMany' ||
+                    attr.relation === 'morphToOne'
+                ) {
                     str += 'any';
                     break;
                 }
@@ -142,11 +148,15 @@ export default class Attributes {
                 str += dependencyName;
                 const relationInterfaceWrapped = this.RelationNames[apiName];
                 if (!relationInterfaceWrapped) {
-                    throw new Error(`Could not find relation ${apiName}, consider using another reader.`);
+                    throw new Error(
+                        `Could not find relation ${apiName}, consider using another reader.`
+                    );
                 }
                 const relationInterface = relationInterfaceWrapped.file;
                 if (!(relationInterface instanceof Interface)) {
-                    throw new Error(`t4s internal error: Expected relation ${apiName} to be an interface, but it was not. Please open an issue on the GitHub repository.`);
+                    throw new Error(
+                        `t4s internal error: Expected relation ${apiName} to be an interface, but it was not. Please open an issue on the GitHub repository.`
+                    );
                 }
                 if (relationInterface.hasPopulatableAttributes()) {
                     str += '<';
@@ -162,7 +172,9 @@ export default class Attributes {
                 // TODO: assert correctly
                 const componentInterface = relationNameObj.file;
                 if (!(componentInterface instanceof Interface)) {
-                    throw new Error(`t4s internal error: Expected component ${componentName} to be an interface, but it was not. Please open an issue on the GitHub repository.`);
+                    throw new Error(
+                        `t4s internal error: Expected component ${componentName} to be an interface, but it was not. Please open an issue on the GitHub repository.`
+                    );
                 }
                 /* console.log(this.RelationNames); */
                 const dependencyComponentName: string = relationNameObj.name;
@@ -204,12 +216,16 @@ export default class Attributes {
                     (componentName: string) => {
                         const component = this.RelationNames[componentName];
                         if (!component) {
-                            throw new Error(`Could not find component ${componentName}, consider using another reader.`);
+                            throw new Error(
+                                `Could not find component ${componentName}, consider using another reader.`
+                            );
                         }
                         // in this context file should always be an interface
                         const file = component.file;
                         if (!(file instanceof Interface)) {
-                            throw new Error(`t4s internal error: Expected component ${componentName} to be an interface, but it was not. Please open an issue on the GitHub repository.`);
+                            throw new Error(
+                                `t4s internal error: Expected component ${componentName} to be an interface, but it was not. Please open an issue on the GitHub repository.`
+                            );
                         }
                         const populatable = file.hasPopulatableAttributes();
                         /* false; */
