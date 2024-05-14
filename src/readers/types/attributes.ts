@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { CERTAINLY_REQUIRED_KEY } from '../../constants';
 
 export const baseAttribute = z.object({
-    pluginOptions: z.any(),
+    pluginOptions: z.any().optional(),
     required: z.boolean().optional(),
     [CERTAINLY_REQUIRED_KEY]: z.boolean().optional(),
 });
@@ -32,6 +32,11 @@ export const richTextAttribute = baseAttribute.extend({
 
 export type RichTextAttribute = z.infer<typeof richTextAttribute>;
 
+export const blocksAttribute = baseAttribute.extend({
+    type: z.literal('blocks'),
+    // TODO: fill out the rest of the fields
+});
+
 export const jsonAttribute = baseAttribute.extend({
     type: z.literal('json'),
 });
@@ -60,7 +65,7 @@ export const decimalAttribute = baseAttribute.extend({
     type: z.literal('decimal'),
 });
 
-export const numberAttribute = z.union([
+export const numberAttribute = z.discriminatedUnion('type', [
     integerAttribute,
     floatAttribute,
     bigIntAttribute,
@@ -88,7 +93,7 @@ export const timeAttribute = baseAttribute.extend({
     type: z.literal('time'),
 });
 
-export const dateAttribute = z.union([
+export const dateAttribute = z.discriminatedUnion('type', [
     dateOnlyAttribute,
     dateTimeAttribute,
     timeAttribute,
@@ -147,12 +152,12 @@ export const hasManyAttribute = baseRelationAttribute.extend({
     relation: z.literal('oneToMany'),
 });
 
-export const morphToManyAttribute = z.object({
+export const morphToManyAttribute = baseAttribute.extend({
     type: z.literal('relation'),
     relation: z.literal('morphToMany'),
 });
 
-export const morphOneAttribute = z.object({
+export const morphOneAttribute = baseAttribute.extend({
     type: z.literal('relation'),
     relation: z.literal('morphToOne'),
 });
@@ -185,23 +190,39 @@ export const dynamiczoneAttribute = baseAttribute.extend({
 
 export type DynamiczoneAttribute = z.infer<typeof dynamiczoneAttribute>;
 
-export const attribute = z.union([
+export const knownAttribute = z.union([
     textAttribute,
     emailAttribute,
     uidAttribute,
     richTextAttribute,
     jsonAttribute,
     passwordAttribute,
-    numberAttribute,
+    ...numberAttribute.options,
     enumAttribute,
-    dateAttribute,
+    ...dateAttribute.options,
     mediaAttribute,
     booleanAttribute,
-    relationAttribute,
+    ...relationAttribute.options,
     componentAttribute,
 ]);
 
+export type KnownAttribute = z.infer<typeof knownAttribute>;
+
+
+export const anyAttribute = baseAttribute.extend({
+    type: z.custom<'any'>(val => !knownAttribute.options.some(schema => schema.shape.type.safeParse(val).success)).transform(() => 'any' as const),
+}).passthrough();
+
+export type AnyAttribute = z.infer<typeof anyAttribute>;
+
+export const attribute = z.union([...knownAttribute.options, anyAttribute]);
+// export const attribute = knownAttribute;
+
 export type Attribute = z.infer<typeof attribute>;
+
+export const isKnownAttribute = <T extends Attribute>(attributeObject: T): attributeObject is T & KnownAttribute => {
+    return attribute.safeParse(attributeObject).success;
+};
 
 export const contentTypeAttribute = z.union([attribute, dynamiczoneAttribute]);
 
