@@ -195,6 +195,7 @@ export const knownAttribute = z.union([
     emailAttribute,
     uidAttribute,
     richTextAttribute,
+    blocksAttribute,
     jsonAttribute,
     passwordAttribute,
     ...numberAttribute.options,

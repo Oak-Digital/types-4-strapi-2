@@ -240,6 +240,9 @@ export default class Attributes {
                 // console.log(relationsString);
                 str += `Array<${relationsString}>`;
                 break;
+            case 'blocks':
+                str += 'any[]' + requiredString;
+                break;
             case 'string':
             case 'text':
             case 'richtext':
