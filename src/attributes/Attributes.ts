@@ -194,7 +194,7 @@ export default class Attributes {
                 break;
             case 'media':
                 const mediaMultipleString = attr.multiple
-                    ? '[]'
+                    ? `[] ${requiredString}`
                     : requiredString;
                 str += `{ data: `;
                 str += this.RelationNames['builtins::Media'].name;
