@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "dynamic_zone_tests",
+  "info": {
+    "singularName": "dynamic-zone-test",
+    "pluralName": "dynamic-zone-tests",
+    "displayName": "Dynamic zone test"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "content": {
+      "type": "dynamiczone",
+      "components": [
+        "blocks.accordion",
+        "blocks.paragraph",
+        "blocks.image"
+      ]
+    }
+  }
+}

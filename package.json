@@ -1,12 +1,13 @@
 {
     "name": "@oak-digital/types-4-strapi-2",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Typescript interface generator for Strapi 4 models",
     "bin": {
         "t4s": "./bin/index.js"
     },
     "scripts": {
         "build": "rimraf lib && tsc -p .",
+        "test": "node -r ts-node/register ./tests/dynamiczone-regression.ts",
         "testtypes": "node ./bin/index.js",
         "lint": "eslint src/",
         "prettier": "prettier --write \"src/**/*.ts\"",

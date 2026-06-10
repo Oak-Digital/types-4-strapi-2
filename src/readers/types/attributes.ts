@@ -225,6 +225,6 @@ export const isKnownAttribute = <T extends Attribute>(attributeObject: T): attri
     return attribute.safeParse(attributeObject).success;
 };
 
-export const contentTypeAttribute = z.union([attribute, dynamiczoneAttribute]);
+export const contentTypeAttribute = z.union([dynamiczoneAttribute, attribute]);
 
 export type ContentTypeAttribute = z.infer<typeof contentTypeAttribute>;
