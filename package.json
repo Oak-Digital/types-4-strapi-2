@@ -5,9 +5,16 @@
     "bin": {
         "t4s": "./bin/index.js"
     },
+    "files": [
+        "bin",
+        "lib",
+        "README.md",
+        "LICENSE",
+        "CHANGELOG.md"
+    ],
     "scripts": {
         "build": "rimraf lib && tsc -p .",
-        "test": "node -r ts-node/register ./tests/dynamiczone-regression.ts",
+        "test": "node -r ts-node/register ./tests/dynamiczone-regression.ts && node -r ts-node/register ./tests/pack-regression.ts",
         "testtypes": "node ./bin/index.js",
         "lint": "eslint src/",
         "prettier": "prettier --write \"src/**/*.ts\"",
